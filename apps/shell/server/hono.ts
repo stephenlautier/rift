@@ -92,10 +92,8 @@ function getApp(): Hono {
 			});
 		} catch {
 			await next();
-			return;
 		}
 	});
-	// oxlint-enable typescript-eslint/consistent-return
 
 	// Proxy `/api/*` to `@rift/api` (mirrors the Vite dev-server proxy so the
 	// browser can talk to the same origin in both dev and prod). Auth.js
