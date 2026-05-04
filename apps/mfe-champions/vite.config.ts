@@ -1,5 +1,5 @@
 import { federation } from "@module-federation/vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-oxc";
 import path from "node:path";
 import { defineConfig } from "vite";
 
