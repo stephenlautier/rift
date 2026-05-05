@@ -41,5 +41,6 @@
       "inputs": ["default", "^production"]
     }
   },
-  "analytics": false
+  "analytics": false,
+  "parallel": 8
 }
