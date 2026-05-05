@@ -6,13 +6,10 @@
   "tags": ["type:app", "scope:api"],
   "targets": {
     "build": {
-      "executor": "@nx/js:tsc",
+      "executor": "nx:run-commands",
       "options": {
-        "outputPath": "{projectRoot}/dist",
-        "tsConfig": "{projectRoot}/tsconfig.json",
-        "packageJson": "{projectRoot}/package.json",
-        "main": "{projectRoot}/src/index.ts",
-        "assets": []
+        "command": "pnpm tsdown",
+        "cwd": "apps/api"
       },
       "outputs": ["{projectRoot}/dist"],
       "dependsOn": ["^build"]
@@ -35,9 +32,10 @@
       "executor": "nx:run-commands",
       "continuous": true,
       "options": {
-        "command": "pnpm start",
+        "command": "pnpm serve",
         "cwd": "apps/api"
-      }
+      },
+      "dependsOn": ["build"]
     },
     "db:push": {
       "executor": "nx:run-commands",

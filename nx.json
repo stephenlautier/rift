@@ -15,7 +15,7 @@
       "continuous": true
     },
     "build": {
-      // "cache": true,
+      "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
@@ -41,5 +41,6 @@
       "inputs": ["default", "^production"]
     }
   },
-  "analytics": false
+  "analytics": false,
+  "parallel": 8
 }

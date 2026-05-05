@@ -6,15 +6,12 @@
   "tags": ["type:lib", "scope:player"],
   "targets": {
     "build": {
-      "executor": "@nx/js:tsc",
+      "executor": "nx:run-commands",
       "options": {
-        "outputPath": "{projectRoot}/dist",
-        "tsConfig": "{projectRoot}/tsconfig.json",
-        "packageJson": "{projectRoot}/package.json",
-        "main": "{projectRoot}/src/index.ts",
-        "assets": []
+        "command": "pnpm tsdown",
+        "cwd": "libs/player"
       },
-      "outputs": ["{workspaceRoot}/dist/{projectRoot}"]
+      "outputs": ["{projectRoot}/dist"]
     },
     "lint": {
       "executor": "nx:run-commands",

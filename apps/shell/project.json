@@ -28,7 +28,7 @@
         "command": "pnpm preview",
         "cwd": "apps/shell"
       },
-      "dependsOn": ["build"]
+      "dependsOn": ["build", { "target": "build", "projects": ["mfe-champions", "mfe-tier-list"] }]
     },
     "lint": {
       "executor": "nx:run-commands",

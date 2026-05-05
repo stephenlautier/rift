@@ -3,17 +3,18 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "main": "./dist/src/app.js",
-  "types": "./dist/src/app.d.ts",
+  "main": "./dist/app.mjs",
+  "types": "./dist/app.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/src/app.d.ts",
-      "import": "./dist/src/app.js"
+      "types": "./dist/app.d.mts",
+      "import": "./dist/app.mjs"
     }
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
+    "serve": "node --enable-source-maps dist/index.mjs",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts"
@@ -33,6 +34,7 @@
     "@types/node": "catalog:",
     "drizzle-kit": "catalog:",
     "oxlint": "catalog:",
+    "tsdown": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
