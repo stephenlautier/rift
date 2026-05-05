@@ -1,3 +1,4 @@
+import type { ChampionRole } from "@rift/champion";
 import { fetchChampion, fetchChampionAbilities, fetchChampionSkins } from "@rift/data-access";
 import type { Metadata } from "next";
 import type { JSX } from "react";
@@ -43,7 +44,7 @@ export default async function ChampionDetailPage({ params }: ChampionPageProps):
 					<div className="flex items-center gap-3">
 						<h1 className="text-3xl font-bold">{champion.name}</h1>
 						<div className="flex gap-1">
-							{champion.roles.map(role => (
+							{champion.roles.map((role: ChampionRole) => (
 								<span key={role} className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
 									{role}
 								</span>

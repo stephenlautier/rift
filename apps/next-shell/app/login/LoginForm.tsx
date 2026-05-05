@@ -12,7 +12,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 type LoginFormProps = {
 	callbackUrl: string;
-	error?: string;
+	error?: string | undefined;
 };
 
 export function LoginForm({ callbackUrl, error: initialError }: LoginFormProps): JSX.Element {

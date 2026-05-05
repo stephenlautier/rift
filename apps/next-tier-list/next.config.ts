@@ -1,13 +1,10 @@
 import type { NextConfig } from "next";
 
-const config: NextConfig = {
-	assetPrefix: process.env.NODE_ENV === "production" ? "/tier-list-static" : undefined,
+const config = {
+	assetPrefix: process.env.NODE_ENV === "production" ? "/tier-list-static" : "",
 	basePath: "/tier-list",
-	serverActions: {
-		allowedOrigins: [process.env.SHELL_ORIGIN ?? "http://localhost:3000"],
-	},
 	transpilePackages: ["@rift/next-shared"],
-	output: process.env.DOCKER_BUILD === "1" ? "standalone" : undefined,
-};
+	...(process.env.DOCKER_BUILD === "1" ? { output: "standalone" as const } : {}),
+} satisfies NextConfig;
 
 export default config;

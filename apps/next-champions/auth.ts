@@ -1,9 +1,10 @@
-import NextAuth from "next-auth";
-
 import { authConfig } from "@rift/next-shared";
+import NextAuth from "next-auth";
+import type { NextAuthResult } from "next-auth";
 
 /**
  * Champions zone only reads the session — no handlers (no `/api/auth/**`).
  * Shares AUTH_SECRET with shell to verify the JWT cookie.
  */
-export const { auth } = NextAuth(authConfig);
+const nextAuth: NextAuthResult = NextAuth(authConfig);
+export const auth: NextAuthResult["auth"] = nextAuth.auth;

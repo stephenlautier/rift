@@ -45,7 +45,7 @@ const config: NextConfig = {
 		];
 	},
 	// Standalone output for Docker deployment
-	output: process.env.DOCKER_BUILD === "1" ? "standalone" : undefined,
+	...(process.env.DOCKER_BUILD === "1" ? { output: "standalone" as const } : {}),
 };
 
 export default config;

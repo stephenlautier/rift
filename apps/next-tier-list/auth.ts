@@ -1,5 +1,6 @@
-import NextAuth from "next-auth";
-
 import { authConfig } from "@rift/next-shared";
+import NextAuth from "next-auth";
+import type { NextAuthResult } from "next-auth";
 
-export const { auth } = NextAuth(authConfig);
+const nextAuth: NextAuthResult = NextAuth(authConfig);
+export const auth: NextAuthResult["auth"] = nextAuth.auth;

@@ -1,3 +1,4 @@
+"use client";
 import type { Player, PlayerChampion, PlayerMatchEntry } from "@rift/player";
 import { useEffect, useState } from "react";
 

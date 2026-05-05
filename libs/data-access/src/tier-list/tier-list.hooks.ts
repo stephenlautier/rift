@@ -1,3 +1,4 @@
+"use client";
 import type { ChampionRole, ChampionTier, Tier } from "@rift/champion";
 import { useEffect, useState } from "react";
 

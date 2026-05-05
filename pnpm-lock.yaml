@@ -387,6 +387,9 @@ importers:
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
+      jotai:
+        specifier: 'catalog:'
+        version: 2.19.1(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.5)
       lucide-react:
         specifier: 'catalog:'
         version: 1.11.0(react@19.2.5)
@@ -448,6 +451,9 @@ importers:
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
+      jotai:
+        specifier: 'catalog:'
+        version: 2.19.1(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.5)
       lucide-react:
         specifier: 'catalog:'
         version: 1.11.0(react@19.2.5)
@@ -794,6 +800,9 @@ importers:
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
+      jotai:
+        specifier: 'catalog:'
+        version: 2.19.1(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.5)
       lucide-react:
         specifier: 'catalog:'
         version: 1.11.0(react@19.2.5)

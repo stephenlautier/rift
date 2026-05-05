@@ -15,6 +15,7 @@
     "@rift/player": "workspace:*",
     "@rift/styles": "workspace:*",
     "clsx": "catalog:",
+    "jotai": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "next-auth": "catalog:",
@@ -28,7 +29,6 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "oxlint": "catalog:",
-    "oxlint-tsgolint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"

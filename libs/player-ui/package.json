@@ -6,8 +6,7 @@
   "files": [
     "dist/",
     "loader/",
-    "hydrate/",
-    "src/react/"
+    "hydrate/"
   ],
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -57,5 +56,6 @@
   },
   "peerDependencies": {
     "react": ">=18.0.0"
-  }
+  },
+  "collection": "dist/collection/collection-manifest.json"
 }

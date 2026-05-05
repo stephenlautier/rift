@@ -343,36 +343,38 @@ And scoped override for Next.js zones (removes Vike-era noise):
 
 ## Migration Phases
 
-### Phase 0 — Pre-requisites ✅ (in progress)
+### Phase 0 — Pre-requisites ✅
 - [x] Install `@nx/next@22.7.0`
-- [ ] Add `next`, `next-auth`, `@tailwindcss/postcss` to pnpm catalog
-- [ ] Create `.env.example`
+- [x] Add `next`, `next-auth`, `@tailwindcss/postcss`, `jotai` to pnpm catalog
+- [x] Create `.env.example`
 
-### Phase 1 — Shared Infrastructure
-- [ ] **1a** Create `libs/next-shared` (`@rift/next-shared`)
-- [ ] **1b** Add server-side fetch utilities to `libs/data-access`
-- [ ] **1c** Update `tsconfig.base.json` paths + `libs/ui/package.json` exports
+### Phase 1 — Shared Infrastructure ✅
+- [x] **1a** Create `libs/next-shared` (`@rift/next-shared`)
+- [x] **1b** Add server-side fetch utilities to `libs/data-access` (`src/server/`)
+- [x] **1c** Update `tsconfig.base.json` paths + `libs/ui/package.json` exports
 
-### Phase 2 — Scaffold Next.js Zones
-- [ ] **2a** `apps/next-shell`
-- [ ] **2b** `apps/next-champions`
-- [ ] **2c** `apps/next-tier-list`
-- [ ] **2d** `apps/next-player`
+### Phase 2 — Scaffold Next.js Zones ✅
+- [x] **2a** `apps/next-shell`
+- [x] **2b** `apps/next-champions`
+- [x] **2c** `apps/next-tier-list`
+- [x] **2d** `apps/next-player`
 
-### Phase 3 — Feature Migration
-- [ ] **3a** Shell: home, login, NextAuth handlers
-- [ ] **3b** Champions: grid + detail with Stencil SSR
-- [ ] **3c** Tier list: Jotai filters + server-rendered rows
-- [ ] **3d** Player: auth guard + Stencil player-app SSR
+### Phase 3 — Feature Migration ✅
+- [x] **3a** Shell: home, login, NextAuth handlers
+- [x] **3b** Champions: grid + detail with Stencil SSR
+- [x] **3c** Tier list: Jotai filters + server-rendered rows
+- [x] **3d** Player: auth guard + Stencil player-app SSR
 
-### Phase 4 — Relocate `apps/mfe-player` → `libs/player-ui`
-- [ ] Create `@rift/player-ui` package
-- [ ] Update `next-player` to import from `@rift/player-ui`
+### Phase 4 — Relocate `apps/mfe-player` → `libs/player-ui` (partial)
+- [x] Create `@rift/player-ui` package scaffold (builds, lint passes)
+- [ ] **Migrate source** — copy components/data from `apps/mfe-player/src/` into `libs/player-ui/src/`
+- [ ] Update `next-player` imports to use `@rift/player-ui` components
 
-### Phase 5 — Infrastructure
-- [ ] Docker Compose + per-zone Dockerfiles
-- [ ] Update `oxlint.config.ts` with `nextjs` plugin
-- [ ] Update root `pnpm dev` script
+### Phase 5 — Infrastructure ✅
+- [x] Docker Compose + per-zone Dockerfiles (next-shell, next-champions, next-tier-list, next-player)
+- [ ] `apps/api/Dockerfile` (referenced in docker-compose.yml — not yet created)
+- [x] Update `oxlint.config.ts` with `nextjs` plugin
+- [x] Update root `pnpm dev` / `pnpm build` scripts
 
 ### Phase 6 — Cleanup (after verification)
 - [ ] Remove old Vike apps: `apps/shell`, `apps/mfe-champions`, `apps/mfe-tier-list`
@@ -391,4 +393,4 @@ And scoped override for Next.js zones (removes Vike-era noise):
 
 ---
 
-*Last updated: Phase 0 — `@nx/next` installed, scaffolding in progress.*
+*Last updated: Phases 0–3 + Phase 5 complete. All 4 zones build (`pnpm build` passing). Phase 4 partial (player-ui scaffold done; source migration pending). Phase 6 deferred until zones are verified running.*

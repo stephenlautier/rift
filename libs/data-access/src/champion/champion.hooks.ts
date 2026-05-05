@@ -1,3 +1,4 @@
+"use client";
 import type { Champion, ChampionAbility, ChampionSkin } from "@rift/champion";
 import { useEffect, useState } from "react";
 

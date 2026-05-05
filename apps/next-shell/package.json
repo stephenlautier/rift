@@ -31,7 +31,6 @@
     "@types/react-dom": "catalog:",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
-    "oxlint-tsgolint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
   }

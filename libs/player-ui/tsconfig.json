@@ -8,7 +8,8 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
     "lib": ["ES2023", "dom"],
-    "target": "ES2017"
+    "target": "ES2017",
+    "strictNullChecks": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "loader", "hydrate", "www"]

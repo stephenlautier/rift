@@ -1,10 +1,11 @@
 import { TierSchema, ChampionRoleSchema } from "@rift/champion";
 import { fetchTierList } from "@rift/data-access";
+import type { TierListFilters } from "@rift/data-access";
 import type { Metadata } from "next";
 import type { JSX } from "react";
 import * as v from "valibot";
 
-import { TierListFilters } from "@/tier-list/TierListFilters";
+import { TierListFilters as TierListFiltersComponent } from "@/tier-list/TierListFilters";
 
 export const metadata: Metadata = { title: "Tier List" };
 
@@ -34,11 +35,18 @@ export default async function TierListPage({ searchParams }: TierListPageProps):
 	const { tier, role, patch } = await searchParams;
 	const apiUrl = process.env.API_URL ?? "http://localhost:3100";
 
-	const filters = {
-		tier: parseTier(tier),
-		role: parseRole(role),
-		patch: patch === "latest" ? undefined : patch,
-	};
+	const filters: TierListFilters = {};
+	const parsedTier = parseTier(tier);
+	const parsedRole = parseRole(role);
+	if (parsedTier !== undefined) {
+		filters.tier = parsedTier;
+	}
+	if (parsedRole !== undefined) {
+		filters.role = parsedRole;
+	}
+	if (patch !== undefined && patch !== "latest") {
+		filters.patch = patch;
+	}
 
 	const tierList = await fetchTierList(filters, `${apiUrl}/api`);
 
@@ -50,7 +58,7 @@ export default async function TierListPage({ searchParams }: TierListPageProps):
 			<h1 className="text-3xl font-bold tracking-tight">Tier List</h1>
 
 			{/* Client filter UI — reads/writes Jotai atoms */}
-			<TierListFilters patches={patches} />
+			<TierListFiltersComponent patches={patches} />
 
 			{/* Server-rendered rows */}
 			<div className="rounded-xl border border-border overflow-hidden">

@@ -15,14 +15,14 @@
     "@rift/next-shared": "workspace:*",
     "@rift/styles": "workspace:*",
     "clsx": "catalog:",
-    "valibot": "catalog:",
     "jotai": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "next-auth": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "tw-animate-css": "catalog:"
+    "tw-animate-css": "catalog:",
+    "valibot": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "catalog:",
@@ -30,7 +30,6 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "oxlint": "catalog:",
-    "oxlint-tsgolint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"

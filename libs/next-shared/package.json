@@ -24,13 +24,10 @@
   },
   "dependencies": {
     "clsx": "catalog:",
+    "jotai": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "tailwind-merge": "catalog:"
-  },
-  "peerDependencies": {
-    "next": ">=16.0.0",
-    "next-auth": ">=5.0.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -40,5 +37,9 @@
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "next": ">=16.0.0",
+    "next-auth": ">=5.0.0"
   }
 }

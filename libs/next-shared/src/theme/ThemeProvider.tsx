@@ -1,7 +1,7 @@
 "use client";
 
+import type { JSX, ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
 
 export type ThemeMode = "system" | "light" | "dark";
 
