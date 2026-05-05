@@ -1,0 +1,46 @@
+{
+  "name": "next-player",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/next-player",
+  "tags": ["type:app", "scope:player"],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "options": {
+        "root": "apps/next-player",
+        "outputPath": "dist/apps/next-player"
+      },
+      "dependsOn": ["^build"]
+    },
+    "dev": {
+      "executor": "@nx/next:server",
+      "options": {
+        "buildTarget": "next-player:build",
+        "dev": true,
+        "port": 3003
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxlint --type-aware app",
+        "cwd": "apps/next-player"
+      }
+    },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxfmt app",
+        "cwd": "apps/next-player"
+      }
+    },
+    "fmt:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxfmt --check app",
+        "cwd": "apps/next-player"
+      }
+    }
+  }
+}

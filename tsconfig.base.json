@@ -16,7 +16,9 @@
     "paths": {
       "@rift/auth": ["./libs/auth/src/index.ts"],
       "@rift/champion": ["./libs/champion/src/index.ts"],
+      "@rift/next-shared": ["./libs/next-shared/src/index.ts"],
       "@rift/player": ["./libs/player/src/index.ts"],
+      "@rift/player-ui": ["./libs/player-ui/src/index.ts"],
       "@rift/ui": ["./libs/ui/src/index.ts"],
       "@rift/ui/react": ["./libs/ui/src/react/components.ts"],
       "@rift/ui/loader": ["./libs/ui/loader/index.d.ts"],

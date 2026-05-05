@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "lib": ["ES2023", "dom"],
+    "target": "ES2017"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "loader", "hydrate", "www"]
+}

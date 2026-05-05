@@ -1,0 +1,46 @@
+{
+  "name": "next-tier-list",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/next-tier-list",
+  "tags": ["type:app", "scope:tier-list"],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "options": {
+        "root": "apps/next-tier-list",
+        "outputPath": "dist/apps/next-tier-list"
+      },
+      "dependsOn": ["^build"]
+    },
+    "dev": {
+      "executor": "@nx/next:server",
+      "options": {
+        "buildTarget": "next-tier-list:build",
+        "dev": true,
+        "port": 3002
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxlint --type-aware app",
+        "cwd": "apps/next-tier-list"
+      }
+    },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxfmt app",
+        "cwd": "apps/next-tier-list"
+      }
+    },
+    "fmt:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxfmt --check app",
+        "cwd": "apps/next-tier-list"
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "next-tier-list",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port ${PORT:-3002}",
+    "build": "next build",
+    "start": "next start --port ${PORT:-3002}",
+    "lint": "oxlint --type-aware app"
+  },
+  "dependencies": {
+    "@rift/champion": "workspace:*",
+    "@rift/data-access": "workspace:*",
+    "@rift/next-shared": "workspace:*",
+    "@rift/styles": "workspace:*",
+    "clsx": "catalog:",
+    "valibot": "catalog:",
+    "jotai": "catalog:",
+    "lucide-react": "catalog:",
+    "next": "catalog:",
+    "next-auth": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tw-animate-css": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
+  }
+}

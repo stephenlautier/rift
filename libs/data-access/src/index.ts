@@ -22,3 +22,15 @@ export type {
 	PlayerSummaryMatch,
 	PlayerSummaryUser,
 } from "./player/player-summary";
+
+// ── Server-side fetchers (Next.js Server Components / Vike +data.ts) ──────────
+export {
+	fetchChampion,
+	fetchChampionAbilities,
+	fetchChampions,
+	fetchChampionSkins,
+	fetchTierList,
+	fetchPlayerChampions,
+	fetchPlayerMatches,
+	fetchPlayerMe,
+} from "./server/index";

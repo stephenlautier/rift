@@ -1,12 +1,13 @@
 {
-  "name": "@rift/ui",
+  "name": "@rift/player-ui",
   "version": "0.0.1",
   "private": true,
-  "description": "StencilJS web components design system (lol-* prefix)",
+  "description": "Player profile Stencil web components (relocated from apps/mfe-player). SSR-ready via dist-hydrate-script.",
   "files": [
     "dist/",
+    "loader/",
     "hydrate/",
-    "loader/"
+    "src/react/"
   ],
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -26,43 +27,35 @@
       "types": "./src/react/components.server.ts",
       "import": "./src/react/components.server.ts"
     },
-    "./components/*": {
-      "types": "./dist/components/*.d.ts",
-      "import": "./dist/components/*.js"
-    },
-    "./dist/components": {
-      "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.js"
-    },
-    "./dist/components/*": {
-      "types": "./dist/components/*.d.ts",
-      "import": "./dist/components/*.js"
-    },
     "./loader": {
       "import": "./loader/index.js"
     },
     "./hydrate": {
       "types": "./hydrate/index.d.ts",
       "import": "./hydrate/index.mjs",
-      "require": "./hydrate/index.js"
+      "require": "./hydrate/index.js",
+      "default": "./hydrate/index.js"
     }
   },
   "scripts": {
     "build": "stencil build",
     "devx": "stencil build --dev --watch --serve",
-    "generate": "stencil generate"
+    "generate": "stencil generate",
+    "lint": "oxlint src/"
   },
   "dependencies": {
-    "@stencil/core": "4.43.4",
-    "@stencil/react-output-target": "1.5.2"
+    "@rift/champion": "workspace:*",
+    "@rift/data-access": "workspace:*",
+    "@rift/player": "workspace:*",
+    "@stencil/core": "catalog:",
+    "@stencil/react-output-target": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0"
+    "@types/node": "catalog:",
+    "oxlint": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "react": ">=18.0.0"
-  },
-  "collection": "dist/collection/collection-manifest.json",
-  "collection:main": "dist/collection/index.js",
-  "es2017": "dist/esm/index.mjs"
+  }
 }

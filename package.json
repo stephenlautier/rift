@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm kill-ports && nx run-many -t dev --projects=shell,api --parallel",
+    "dev:next": "pnpm kill-ports && nx run-many -t dev --projects=next-shell,next-champions,next-tier-list,next-player,api --parallel",
     "dev:shell": "nx run shell:dev",
+    "dev:next-shell": "nx run next-shell:dev",
     "dev:api": "nx run api:dev",
     "preview": "pnpm kill-ports && nx run-many -t preview --projects=shell,api --parallel",
     "preview:shell": "nx run shell:preview",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "@nx/js": "22.7.0",
+    "@nx/next": "22.7.0",
     "@nx/playwright": "22.7.0",
     "@nx/vite": "22.7.0",
     "@types/node": "catalog:",

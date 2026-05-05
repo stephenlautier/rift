@@ -1,0 +1,98 @@
+version: "3.9"
+
+services:
+  # ── API ────────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: "3100"
+      DATABASE_URL: ./data/rift.db
+    volumes:
+      - ./apps/api/data:/app/data
+    networks:
+      - rift-internal
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:3100/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Shell (zone 0 — owns auth + routing) ──────────────────────────────────
+  next-shell:
+    build:
+      context: .
+      dockerfile: apps/next-shell/Dockerfile
+    environment:
+      PORT: "3000"
+      AUTH_SECRET: "${AUTH_SECRET}"
+      AUTH_URL: "${AUTH_URL:-http://localhost:3000}"
+      COOKIE_DOMAIN: "${COOKIE_DOMAIN:-}"
+      NEXT_CHAMPIONS_URL: "http://next-champions:3001"
+      NEXT_TIER_LIST_URL: "http://next-tier-list:3002"
+      NEXT_PLAYER_URL: "http://next-player:3003"
+      API_URL: "http://api:3100"
+      SHELL_ORIGIN: "${AUTH_URL:-http://localhost:3000}"
+    ports:
+      - "${SHELL_PORT:-3000}:3000"
+    networks:
+      - rift-internal
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ── Champions zone ────────────────────────────────────────────────────────
+  next-champions:
+    build:
+      context: .
+      dockerfile: apps/next-champions/Dockerfile
+    environment:
+      PORT: "3001"
+      AUTH_SECRET: "${AUTH_SECRET}"
+      AUTH_URL: "${AUTH_URL:-http://localhost:3000}"
+      SHELL_ORIGIN: "${AUTH_URL:-http://localhost:3000}"
+      API_URL: "http://api:3100"
+    networks:
+      - rift-internal
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ── Tier list zone ────────────────────────────────────────────────────────
+  next-tier-list:
+    build:
+      context: .
+      dockerfile: apps/next-tier-list/Dockerfile
+    environment:
+      PORT: "3002"
+      AUTH_SECRET: "${AUTH_SECRET}"
+      AUTH_URL: "${AUTH_URL:-http://localhost:3000}"
+      SHELL_ORIGIN: "${AUTH_URL:-http://localhost:3000}"
+      API_URL: "http://api:3100"
+    networks:
+      - rift-internal
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ── Player zone (auth-guarded) ────────────────────────────────────────────
+  next-player:
+    build:
+      context: .
+      dockerfile: apps/next-player/Dockerfile
+    environment:
+      PORT: "3003"
+      AUTH_SECRET: "${AUTH_SECRET}"
+      AUTH_URL: "${AUTH_URL:-http://localhost:3000}"
+      SHELL_ORIGIN: "${AUTH_URL:-http://localhost:3000}"
+      API_URL: "http://api:3100"
+    networks:
+      - rift-internal
+    depends_on:
+      api:
+        condition: service_healthy
+
+networks:
+  rift-internal:
+    driver: bridge
