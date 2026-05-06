@@ -1,4 +1,4 @@
-import { Header, Providers, ThemeSwitcher, ThemeScript, THEME_COOKIE_NAME } from "@rift/next-shared";
+import { Header, Providers, ThemeScript, THEME_COOKIE_NAME } from "@rift/next-shared";
 import type { ThemeMode } from "@rift/next-shared";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -32,9 +32,6 @@ export default async function PlayerLayout({ children }: { children: ReactNode }
 				<Providers initialTheme={initialTheme}>
 					<div className="min-h-screen flex flex-col">
 						<Header session={session} signOutAction={signOutAction} />
-						<div className="flex items-center justify-end px-4 py-1 border-b border-border">
-							<ThemeSwitcher />
-						</div>
 						<main className="flex-1 container mx-auto px-4 py-8">{children}</main>
 					</div>
 				</Providers>

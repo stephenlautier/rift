@@ -1,6 +1,7 @@
 import type { Session } from "next-auth";
 import type { JSX } from "react";
 
+import { ThemeSwitcher } from "../theme/ThemeSwitcher";
 import { Nav } from "./Nav";
 import { SignOutButton } from "./SignOutButton";
 
@@ -21,21 +22,20 @@ export function Header({ session, signOutAction }: HeaderProps): JSX.Element {
 	return (
 		<header className="border-b border-border bg-background sticky top-0 z-10">
 			<div className="container mx-auto px-4 h-14 flex items-center justify-between">
-				<a href="/" className="font-semibold text-foreground hover:text-primary transition-colors">
+				<a href="/" className="font-semibold text-foreground">
 					Rift
 				</a>
 				<Nav />
 				<div className="flex items-center gap-4 text-sm">
+					<ThemeSwitcher />
 					{displayName ? (
 						<span className="flex items-center gap-2">
-							<span className="text-foreground">{displayName}</span>
+							<span>{displayName}</span>
 							<span className="text-muted-foreground">·</span>
 							<SignOutButton action={signOutAction} />
 						</span>
 					) : (
-						<a href="/login" className="text-muted-foreground hover:text-foreground transition-colors">
-							Sign in
-						</a>
+						<a href="/login">Sign in</a>
 					)}
 				</div>
 			</div>

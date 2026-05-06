@@ -911,13 +911,16 @@ importers:
       '@stencil/react-output-target':
         specifier: 1.5.2
         version: 1.5.2(@stencil/core@4.43.4)(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      react:
-        specifier: '>=18.0.0'
-        version: 19.2.5
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.17
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      react:
+        specifier: 'catalog:'
+        version: 19.2.5
 
 packages:
 

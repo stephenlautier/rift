@@ -19,11 +19,13 @@
     },
     "./react": {
       "types": "./src/react/components.ts",
+      "react-server": "./src/react/components.next-server.ts",
       "node": "./src/react/components.server.ts",
       "import": "./src/react/components.ts"
     },
     "./react/ssr": {
       "types": "./src/react/components.server.ts",
+      "react-server": "./src/react/components.next-server.ts",
       "import": "./src/react/components.server.ts"
     },
     "./components/*": {
@@ -33,6 +35,10 @@
     "./dist/components": {
       "types": "./dist/components/index.d.ts",
       "import": "./dist/components/index.js"
+    },
+    "./dist/components/*.js": {
+      "types": "./dist/components/*.d.ts",
+      "import": "./dist/components/*.js"
     },
     "./dist/components/*": {
       "types": "./dist/components/*.d.ts",
@@ -57,7 +63,9 @@
     "@stencil/react-output-target": "1.5.2"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "@types/react": "catalog:",
+    "react": "catalog:"
   },
   "peerDependencies": {
     "react": ">=18.0.0"
