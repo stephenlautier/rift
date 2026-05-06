@@ -2,6 +2,17 @@ import type { Champion, ChampionAbility, ChampionSkin } from "@rift/champion";
 
 import { createApiClient } from "../api-client";
 
+export type ChampionDetail = Champion & {
+	abilities: ChampionAbility[];
+	skins: ChampionSkin[];
+};
+
+type RawChampionDetail = {
+	champion: Champion;
+	abilities: ChampionAbility[];
+	skins: ChampionSkin[];
+};
+
 /**
  * Server-side champion fetchers for use in Next.js Server Components.
  * These are plain async functions, not React hooks.
@@ -16,32 +27,19 @@ export async function fetchChampions(baseUrl = "/api"): Promise<Champion[]> {
 	if (!res.ok) {
 		throw new Error(`fetchChampions: HTTP ${res.status}`);
 	}
-	return res.json();
+	return (await res.json()) as Champion[];
 }
 
-export async function fetchChampion(id: string, baseUrl = "/api"): Promise<Champion> {
+/**
+ * Fetches a single champion with abilities and skins from `GET /champions/:id`.
+ * The API returns a combined `{ champion, abilities, skins }` object.
+ */
+export async function fetchChampionDetail(id: string, baseUrl = "/api"): Promise<ChampionDetail> {
 	const client = createApiClient(baseUrl);
 	const res = await client.champions[":id"].$get({ param: { id } });
 	if (!res.ok) {
-		throw new Error(`fetchChampion(${id}): HTTP ${res.status}`);
+		throw new Error(`fetchChampionDetail(${id}): HTTP ${res.status}`);
 	}
-	return res.json();
-}
-
-export async function fetchChampionAbilities(id: string, baseUrl = "/api"): Promise<ChampionAbility[]> {
-	const client = createApiClient(baseUrl);
-	const res = await client.champions[":id"].abilities.$get({ param: { id } });
-	if (!res.ok) {
-		throw new Error(`fetchChampionAbilities(${id}): HTTP ${res.status}`);
-	}
-	return res.json();
-}
-
-export async function fetchChampionSkins(id: string, baseUrl = "/api"): Promise<ChampionSkin[]> {
-	const client = createApiClient(baseUrl);
-	const res = await client.champions[":id"].skins.$get({ param: { id } });
-	if (!res.ok) {
-		throw new Error(`fetchChampionSkins(${id}): HTTP ${res.status}`);
-	}
-	return res.json();
+	const { champion, abilities, skins } = (await res.json()) as RawChampionDetail;
+	return { ...champion, abilities, skins };
 }

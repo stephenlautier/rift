@@ -22,7 +22,7 @@ export async function fetchPlayerMe(cookie: string, baseUrl = "/api"): Promise<P
 	if (!res.ok) {
 		throw new Error(`fetchPlayerMe: HTTP ${res.status}`);
 	}
-	return res.json();
+	return (await res.json()) as Player;
 }
 
 export async function fetchPlayerChampions(cookie: string, baseUrl = "/api"): Promise<PlayerChampion[]> {
@@ -31,7 +31,7 @@ export async function fetchPlayerChampions(cookie: string, baseUrl = "/api"): Pr
 	if (!res.ok) {
 		throw new Error(`fetchPlayerChampions: HTTP ${res.status}`);
 	}
-	return res.json();
+	return (await res.json()) as PlayerChampion[];
 }
 
 export async function fetchPlayerMatches(cookie: string, baseUrl = "/api"): Promise<PlayerMatchEntry[]> {
@@ -40,5 +40,5 @@ export async function fetchPlayerMatches(cookie: string, baseUrl = "/api"): Prom
 	if (!res.ok) {
 		throw new Error(`fetchPlayerMatches: HTTP ${res.status}`);
 	}
-	return res.json();
+	return (await res.json()) as PlayerMatchEntry[];
 }

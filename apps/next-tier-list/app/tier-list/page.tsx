@@ -1,109 +1,71 @@
-import { TierSchema, ChampionRoleSchema } from "@rift/champion";
-import { fetchTierList } from "@rift/data-access";
-import type { TierListFilters } from "@rift/data-access";
+import { fetchChampions, fetchTierList } from "@rift/data-access";
 import type { Metadata } from "next";
 import type { JSX } from "react";
-import * as v from "valibot";
 
 import { API_URL } from "@/env";
-import { TierListFilters as TierListFiltersComponent } from "@/tier-list/TierListFilters";
+import { parseRole, parseTier } from "@/tier-list/parse-filters";
+import { TierListView } from "@/tier-list/TierListView";
 
 export const metadata: Metadata = { title: "Tier List" };
 
-const TIER_COLORS: Record<string, string> = {
-	S: "text-amber-400 font-bold",
-	A: "text-purple-400 font-bold",
-	B: "text-blue-400 font-bold",
-	C: "text-green-400 font-bold",
-	D: "text-gray-400 font-bold",
-};
+type SearchParams = Promise<{ tier?: string; role?: string; patch?: string }>;
 
-function parseTier(value: unknown) {
-	const result = v.safeParse(TierSchema, value);
-	return result.success ? result.output : undefined;
-}
+export default async function TierListPage({ searchParams }: { searchParams: SearchParams }): Promise<JSX.Element> {
+	const { tier: tierParam, role: roleParam, patch: patchParam } = await searchParams;
 
-function parseRole(value: unknown) {
-	const result = v.safeParse(ChampionRoleSchema, value);
-	return result.success ? result.output : undefined;
-}
+	const [tierList, champions] = await Promise.all([fetchTierList({}, API_URL), fetchChampions(API_URL)]);
 
-type TierListPageProps = {
-	searchParams: Promise<{ tier?: string; role?: string; patch?: string }>;
-};
+	const byId = new Map(champions.map(c => [c.id, c]));
 
-export default async function TierListPage({ searchParams }: TierListPageProps): Promise<JSX.Element> {
-	const { tier, role, patch } = await searchParams;
+	const allEntries = tierList.flatMap(t => {
+		const champion = byId.get(t.championId);
+		if (!champion) {
+			return [];
+		}
+		return [
+			{
+				...t,
+				champion: {
+					id: champion.id,
+					name: champion.name,
+					splashArtUrl: champion.splashArtUrl,
+					roles: champion.roles,
+				},
+			},
+		];
+	});
 
-	const filters: TierListFilters = {};
-	const parsedTier = parseTier(tier);
-	const parsedRole = parseRole(role);
-	if (parsedTier !== undefined) {
-		filters.tier = parsedTier;
-	}
-	if (parsedRole !== undefined) {
-		filters.role = parsedRole;
-	}
-	if (patch !== undefined && patch !== "latest") {
-		filters.patch = patch;
-	}
+	const patches = [...new Set(allEntries.map(e => String(e.patch)))]
+		.toSorted((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+		.toReversed();
 
-	const tierList = await fetchTierList(filters, API_URL);
+	const latestPatch = patches[0] ?? "";
+	const tierFilter = parseTier(tierParam);
+	const roleFilter = parseRole(roleParam);
+	const patchFilter = patchParam ?? "latest";
+	const effectivePatch = patchFilter === "latest" ? latestPatch : patchFilter;
 
-	// Extract unique patches from data for the filter control
-	const patches = [...new Set(tierList.map(entry => entry.patch))].toSorted((a, b) => b.localeCompare(a));
+	const entries = allEntries.filter(e => {
+		if (tierFilter !== "all" && e.tier !== tierFilter) {
+			return false;
+		}
+		if (roleFilter !== "all" && e.role !== roleFilter) {
+			return false;
+		}
+		if (effectivePatch && String(e.patch) !== effectivePatch) {
+			return false;
+		}
+		return true;
+	});
 
 	return (
-		<div className="space-y-6">
-			<h1 className="text-3xl font-bold tracking-tight">Tier List</h1>
-
-			{/* Client filter UI — syncs to URL search params which drive server re-renders */}
-			<TierListFiltersComponent
-				patches={patches}
-				currentTier={parsedTier}
-				currentRole={parsedRole}
-				currentPatch={patch ?? "latest"}
-			/>
-
-			{/* Server-rendered rows */}
-			<div className="rounded-xl border border-border overflow-hidden">
-				<table className="w-full text-sm">
-					<thead>
-						<tr className="border-b border-border bg-muted/50">
-							<th className="text-left px-4 py-3 font-medium text-muted-foreground">Tier</th>
-							<th className="text-left px-4 py-3 font-medium text-muted-foreground">Champion</th>
-							<th className="text-left px-4 py-3 font-medium text-muted-foreground">Role</th>
-							<th className="text-right px-4 py-3 font-medium text-muted-foreground">Win%</th>
-							<th className="text-right px-4 py-3 font-medium text-muted-foreground">Pick%</th>
-							<th className="text-right px-4 py-3 font-medium text-muted-foreground">Patch</th>
-						</tr>
-					</thead>
-					<tbody>
-						{tierList.length === 0 ? (
-							<tr>
-								<td colSpan={6} className="text-center py-12 text-muted-foreground">
-									No data for the selected filters.
-								</td>
-							</tr>
-						) : (
-							tierList.map(entry => (
-								<tr key={entry.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-									<td className={`px-4 py-3 ${TIER_COLORS[entry.tier] ?? ""}`}>{entry.tier}</td>
-									<td className="px-4 py-3">
-										<a href={`/champions/${entry.championId}`} className="hover:underline text-foreground">
-											{entry.championId}
-										</a>
-									</td>
-									<td className="px-4 py-3 text-muted-foreground">{entry.role}</td>
-									<td className="px-4 py-3 text-right tabular-nums">{(entry.winRate * 100).toFixed(1)}%</td>
-									<td className="px-4 py-3 text-right tabular-nums">{(entry.pickRate * 100).toFixed(1)}%</td>
-									<td className="px-4 py-3 text-right text-muted-foreground">{entry.patch}</td>
-								</tr>
-							))
-						)}
-					</tbody>
-				</table>
-			</div>
-		</div>
+		<TierListView
+			entries={entries}
+			patches={patches}
+			tierFilter={tierFilter}
+			roleFilter={roleFilter}
+			patchFilter={patchFilter}
+			latestPatch={latestPatch}
+		/>
 	);
 }

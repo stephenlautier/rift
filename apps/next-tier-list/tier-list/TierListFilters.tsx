@@ -25,19 +25,19 @@ const ROLE_INACTIVE = "border-border text-muted-foreground hover:border-foregrou
 
 type Props = {
 	patches: string[];
-	currentTier?: string;
-	currentRole?: string;
-	currentPatch?: string;
+	tierFilter: Tier | "all";
+	roleFilter: ChampionRole | "all";
+	patchFilter: string;
 };
 
-export function TierListFilters({ patches, currentTier, currentRole, currentPatch = "latest" }: Props): ReactElement {
+export function TierListFilters({ patches, tierFilter, roleFilter, patchFilter }: Props): ReactElement {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const updateParam = useCallback(
-		(key: string, value: string | undefined) => {
+	const setFilter = useCallback(
+		(key: string, value: string) => {
 			const params = new URLSearchParams(searchParams.toString());
-			if (!value || value === "all" || value === "latest") {
+			if (value === "all" || value === "latest") {
 				params.delete(key);
 			} else {
 				params.set(key, value);
@@ -47,9 +47,9 @@ export function TierListFilters({ patches, currentTier, currentRole, currentPatc
 		[router, searchParams],
 	);
 
-	const tier = currentTier ?? "all";
-	const role = currentRole ?? "all";
-	const patch = currentPatch;
+	const setTier = useCallback((t: Tier | "all") => setFilter("tier", t), [setFilter]);
+	const setRole = useCallback((r: ChampionRole | "all") => setFilter("role", r), [setFilter]);
+	const setPatch = useCallback((p: string) => setFilter("patch", p), [setFilter]);
 
 	return (
 		<div className="space-y-3 mb-8 p-4 rounded-xl border border-border bg-card">
@@ -60,10 +60,10 @@ export function TierListFilters({ patches, currentTier, currentRole, currentPatc
 						<FilterButton
 							key={t}
 							value={t}
-							active={tier === t}
-							onSelect={v => updateParam("tier", v)}
+							active={tierFilter === t}
+							onSelect={setTier}
 							className={`px-3 py-1 rounded-md text-sm font-semibold border transition-colors ${
-								tier === t ? `${TIER_COLORS[t]} ring-1 ring-current` : TIER_INACTIVE
+								tierFilter === t ? `${TIER_COLORS[t]} ring-1 ring-current` : TIER_INACTIVE
 							}`}>
 							{t === "all" ? "All Tiers" : t}
 						</FilterButton>
@@ -78,10 +78,10 @@ export function TierListFilters({ patches, currentTier, currentRole, currentPatc
 						<FilterButton
 							key={r}
 							value={r}
-							active={role === r}
-							onSelect={v => updateParam("role", v)}
+							active={roleFilter === r}
+							onSelect={setRole}
 							className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
-								role === r ? ROLE_ACTIVE : ROLE_INACTIVE
+								roleFilter === r ? ROLE_ACTIVE : ROLE_INACTIVE
 							}`}>
 							{r === "all" ? "All Roles" : r}
 						</FilterButton>
@@ -95,10 +95,10 @@ export function TierListFilters({ patches, currentTier, currentRole, currentPatc
 					<div className="flex flex-wrap gap-2">
 						<FilterButton
 							value="latest"
-							active={patch === "latest"}
-							onSelect={v => updateParam("patch", v)}
+							active={patchFilter === "latest"}
+							onSelect={setPatch}
 							className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
-								patch === "latest" ? ROLE_ACTIVE : ROLE_INACTIVE
+								patchFilter === "latest" ? ROLE_ACTIVE : ROLE_INACTIVE
 							}`}>
 							Latest
 						</FilterButton>
@@ -106,10 +106,10 @@ export function TierListFilters({ patches, currentTier, currentRole, currentPatc
 							<FilterButton
 								key={p}
 								value={p}
-								active={patch === p}
-								onSelect={v => updateParam("patch", v)}
+								active={patchFilter === p}
+								onSelect={setPatch}
 								className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
-									patch === p ? ROLE_ACTIVE : ROLE_INACTIVE
+									patchFilter === p ? ROLE_ACTIVE : ROLE_INACTIVE
 								}`}>
 								{p}
 							</FilterButton>

@@ -22,5 +22,5 @@ export async function fetchTierList(filters: TierListFilters = {}, baseUrl = "/a
 	if (!res.ok) {
 		throw new Error(`fetchTierList: HTTP ${res.status}`);
 	}
-	return res.json();
+	return (await res.json()) as ChampionTier[];
 }

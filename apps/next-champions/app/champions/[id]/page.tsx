@@ -1,6 +1,7 @@
-import type { ChampionRole } from "@rift/champion";
-import { fetchChampion, fetchChampionAbilities, fetchChampionSkins } from "@rift/data-access";
+import type { ChampionAbility, ChampionRole, ChampionSkin } from "@rift/champion";
+import { fetchChampionDetail } from "@rift/data-access";
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { JSX } from "react";
 
 import { API_URL } from "@/env";
@@ -9,10 +10,19 @@ type ChampionPageProps = {
 	params: Promise<{ id: string }>;
 };
 
+const SLOT_ORDER = ["P", "Q", "W", "E", "R"] as const;
+const SLOT_LABEL: Record<string, string> = {
+	P: "Passive",
+	Q: "Q",
+	W: "W",
+	E: "E",
+	R: "Ultimate",
+};
+
 export async function generateMetadata({ params }: ChampionPageProps): Promise<Metadata> {
 	const { id } = await params;
 	try {
-		const champion = await fetchChampion(id, API_URL);
+		const champion = await fetchChampionDetail(id, API_URL);
 		return { title: champion.name };
 	} catch {
 		return { title: "Champion" };
@@ -21,58 +31,78 @@ export async function generateMetadata({ params }: ChampionPageProps): Promise<M
 
 export default async function ChampionDetailPage({ params }: ChampionPageProps): Promise<JSX.Element> {
 	const { id } = await params;
+	const champion = await fetchChampionDetail(id, API_URL);
 
-	const [champion, abilities, skins] = await Promise.all([
-		fetchChampion(id, API_URL),
-		fetchChampionAbilities(id, API_URL),
-		fetchChampionSkins(id, API_URL),
-	]);
+	const abilities = [...champion.abilities].toSorted(
+		(a: ChampionAbility, b: ChampionAbility) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot),
+	);
+	const statEntries = Object.entries(champion.stats).map(([key, value]) => ({ key, value }));
 
 	return (
-		<div className="space-y-8">
-			{/* Hero */}
-			<div className="flex gap-6 items-start">
-				{champion.splashArtUrl && (
-					// oxlint-disable-next-line nextjs/no-img-element -- splash art from external CDN, no Next Image needed
-					<img
-						src={champion.splashArtUrl}
-						alt={champion.name}
-						className="w-32 h-32 rounded-lg object-cover object-top shrink-0"
-					/>
-				)}
-				<div className="space-y-2">
-					<div className="flex items-center gap-3">
-						<h1 className="text-3xl font-bold">{champion.name}</h1>
+		<div>
+			{/* Breadcrumb */}
+			<nav className="mb-6 text-sm text-muted-foreground">
+				<Link href="/champions" className="hover:text-foreground transition-colors">
+					Champions
+				</Link>
+				<span className="mx-2">/</span>
+				<span className="text-foreground font-medium">{champion.name}</span>
+			</nav>
+
+			{/* Hero — full-width splash with gradient overlay */}
+			<section className="relative overflow-hidden rounded-xl mb-10">
+				{/* oxlint-disable-next-line nextjs/no-img-element -- splash art from external CDN */}
+				<img src={champion.splashArtUrl} alt={champion.name} className="w-full max-h-80 object-cover object-top" />
+				<div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
+				<div className="absolute bottom-0 left-0 p-6">
+					<div className="flex flex-wrap gap-2 mb-2">
+						{champion.roles.map((role: ChampionRole) => (
+							<span
+								key={role}
+								className="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400">
+								{role}
+							</span>
+						))}
+					</div>
+					<h1 className="text-4xl font-bold tracking-tight">{champion.name}</h1>
+					<div className="flex items-center gap-2 mt-2">
+						<span className="text-xs text-muted-foreground">Difficulty</span>
 						<div className="flex gap-1">
-							{champion.roles.map((role: ChampionRole) => (
-								<span key={role} className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-									{role}
-								</span>
+							{Array.from({ length: 10 }, (_, i) => (
+								<span
+									key={i}
+									className={`w-3 h-1.5 rounded-sm ${i < champion.difficulty ? "bg-amber-400" : "bg-muted"}`}
+								/>
 							))}
 						</div>
+						<span className="text-xs text-muted-foreground">{champion.difficulty}/10</span>
 					</div>
-					<p className="text-muted-foreground text-sm">Difficulty: {champion.difficulty}/10</p>
-					{champion.lore && <p className="text-sm max-w-2xl">{champion.lore}</p>}
 				</div>
-			</div>
+			</section>
+
+			{/* Lore */}
+			<section className="mb-10">
+				<h2 className="text-xl font-semibold mb-3">Lore</h2>
+				<p className="text-muted-foreground leading-relaxed max-w-3xl">{champion.lore}</p>
+			</section>
 
 			{/* Abilities */}
 			{abilities.length > 0 && (
-				<section className="space-y-3">
-					<h2 className="text-xl font-semibold">Abilities</h2>
+				<section className="mb-10">
+					<h2 className="text-xl font-semibold mb-4">Abilities</h2>
 					<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 						{abilities.map(ability => (
-							<div key={ability.id} className="rounded-lg border border-border p-4 space-y-1">
-								<div className="flex items-center gap-2">
-									<span className="text-xs font-mono bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
-										{ability.slot}
+							<div key={ability.id} className="rounded-lg border border-border bg-card p-4">
+								<div className="flex items-center gap-2 mb-2">
+									<span className="inline-flex items-center justify-center whitespace-nowrap rounded bg-muted px-2 py-1 text-xs font-bold text-muted-foreground">
+										{SLOT_LABEL[ability.slot]}
 									</span>
-									<span className="font-medium text-sm">{ability.name}</span>
+									<span className="font-semibold text-sm">{ability.name}</span>
+									{ability.cooldown !== null && ability.cooldown !== undefined && (
+										<span className="ml-auto text-xs text-muted-foreground">{ability.cooldown}s CD</span>
+									)}
 								</div>
-								<p className="text-xs text-muted-foreground">{ability.description}</p>
-								{ability.cooldown !== null && ability.cooldown !== undefined && (
-									<p className="text-xs text-muted-foreground">CD: {ability.cooldown}s</p>
-								)}
+								<p className="text-xs text-muted-foreground leading-relaxed">{ability.description}</p>
 							</div>
 						))}
 					</div>
@@ -80,24 +110,44 @@ export default async function ChampionDetailPage({ params }: ChampionPageProps):
 			)}
 
 			{/* Skins */}
-			{skins.length > 0 && (
-				<section className="space-y-3">
-					<h2 className="text-xl font-semibold">Skins</h2>
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-						{skins.map(skin => (
-							<div key={skin.id} className="rounded-lg border border-border overflow-hidden">
-								{skin.splashArtUrl ? (
-									// oxlint-disable-next-line nextjs/no-img-element -- skin splash art, no optimization needed
-									<img src={skin.splashArtUrl} alt={skin.name} className="w-full aspect-[4/3] object-cover" />
-								) : (
-									<div className="w-full aspect-[4/3] bg-muted" />
-								)}
-								<div className="p-2">
-									<p className="text-sm font-medium truncate">{skin.name}</p>
-									{skin.rpPrice !== null && skin.rpPrice !== undefined && (
-										<p className="text-xs text-muted-foreground">{skin.rpPrice} RP</p>
-									)}
+			{champion.skins.length > 0 && (
+				<section className="mb-10">
+					<h2 className="text-xl font-semibold mb-4">Skins</h2>
+					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+						{champion.skins.map((skin: ChampionSkin) => (
+							<div key={skin.id} className="rounded-lg overflow-hidden border border-border group">
+								<div className="aspect-video overflow-hidden">
+									{/* oxlint-disable-next-line nextjs/no-img-element -- skin splash from CDN */}
+									<img
+										src={skin.splashArtUrl}
+										alt={skin.name}
+										className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+									/>
 								</div>
+								<div className="p-2">
+									<p className="text-xs font-medium truncate">{skin.name}</p>
+									<div className="flex items-center justify-between mt-1">
+										<span className="text-xs capitalize text-muted-foreground">{skin.rarity}</span>
+										{skin.rpPrice > 0 && (
+											<span className="text-xs font-semibold text-amber-400">{skin.rpPrice} RP</span>
+										)}
+									</div>
+								</div>
+							</div>
+						))}
+					</div>
+				</section>
+			)}
+
+			{/* Base Stats */}
+			{statEntries.length > 0 && (
+				<section className="mb-10">
+					<h2 className="text-xl font-semibold mb-4">Base Stats</h2>
+					<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 max-w-2xl">
+						{statEntries.map(({ key, value }) => (
+							<div key={key} className="rounded-lg border border-border bg-card px-3 py-2">
+								<p className="text-xs text-muted-foreground capitalize">{key.replaceAll(/([A-Z])/g, " $1")}</p>
+								<p className="text-sm font-semibold">{String(value)}</p>
 							</div>
 						))}
 					</div>
