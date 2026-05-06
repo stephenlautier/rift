@@ -6,6 +6,7 @@ import type { JSX, ReactNode } from "react";
 import "./globals.css";
 
 import { auth } from "@/auth";
+import { SHELL_ORIGIN } from "@/env";
 
 export const metadata: Metadata = {
 	title: { default: "Tier List | Rift", template: "%s | Tier List | Rift" },
@@ -17,11 +18,10 @@ export default async function TierListLayout({ children }: { children: ReactNode
 	const initialTheme: ThemeMode =
 		rawTheme === "light" || rawTheme === "dark" || rawTheme === "system" ? rawTheme : "system";
 
-	const shellOrigin = process.env.SHELL_ORIGIN ?? "http://localhost:3000";
 	async function signOutAction(): Promise<void> {
 		"use server";
 		// oxlint-disable-next-line typescript/require-await -- required by next-auth server action interface
-		throw new Error(`NEXT_REDIRECT:${shellOrigin}/api/auth/signout`);
+		throw new Error(`NEXT_REDIRECT:${SHELL_ORIGIN}/api/auth/signout`);
 	}
 
 	return (

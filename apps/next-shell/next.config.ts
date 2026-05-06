@@ -37,10 +37,36 @@ const config: NextConfig = {
 				source: "/player-static/:path*",
 				destination: `${NEXT_PLAYER_URL}/player-static/:path*`,
 			},
-			// API proxy
+			// Hono API proxy — explicit paths only, never matching /api/auth/** which
+			// is owned by NextAuth route handlers in this zone.
+			// Strip the /api prefix: browser calls /api/champions → Hono /champions.
 			{
-				source: "/api/:path*",
-				destination: `${API_URL}/api/:path*`,
+				source: "/api/champions",
+				destination: `${API_URL}/champions`,
+			},
+			{
+				source: "/api/champions/:path*",
+				destination: `${API_URL}/champions/:path*`,
+			},
+			{
+				source: "/api/tier-list",
+				destination: `${API_URL}/tier-list`,
+			},
+			{
+				source: "/api/tier-list/:path*",
+				destination: `${API_URL}/tier-list/:path*`,
+			},
+			{
+				source: "/api/player",
+				destination: `${API_URL}/player`,
+			},
+			{
+				source: "/api/player/:path*",
+				destination: `${API_URL}/player/:path*`,
+			},
+			{
+				source: "/api/health",
+				destination: `${API_URL}/health`,
 			},
 		];
 	},

@@ -2,11 +2,12 @@ import { fetchChampions } from "@rift/data-access";
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
+import { API_URL } from "@/env";
+
 export const metadata: Metadata = { title: "All Champions" };
 
 export default async function ChampionsPage(): Promise<JSX.Element> {
-	const apiUrl = process.env.API_URL ?? "http://localhost:3100";
-	const champions = await fetchChampions(`${apiUrl}/api`);
+	const champions = await fetchChampions(API_URL);
 
 	return (
 		<div className="space-y-6">

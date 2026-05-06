@@ -1,7 +1,9 @@
-import { auth } from "@/auth";
 import { createAuthProxy } from "@rift/next-shared";
 
-const loginUrl = (process.env.AUTH_URL ?? "http://localhost:3000") + "/login";
+import { auth } from "@/auth";
+import { AUTH_URL } from "@/env";
+
+const loginUrl = `${AUTH_URL}/login`;
 
 /**
  * Next.js 16 `proxy.ts` — replaces the deprecated `middleware.ts`.

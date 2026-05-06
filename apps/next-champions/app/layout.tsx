@@ -6,6 +6,7 @@ import type { JSX, ReactNode } from "react";
 import "./globals.css";
 
 import { auth } from "@/auth";
+import { SHELL_ORIGIN } from "@/env";
 
 export const metadata: Metadata = {
 	title: { default: "Champions | Rift", template: "%s | Champions | Rift" },
@@ -18,12 +19,11 @@ export default async function ChampionsLayout({ children }: { children: ReactNod
 		rawTheme === "light" || rawTheme === "dark" || rawTheme === "system" ? rawTheme : "system";
 
 	// Non-shell zones redirect to shell for sign-out (shell owns /api/auth/**)
-	const shellOrigin = process.env.SHELL_ORIGIN ?? "http://localhost:3000";
 	async function signOutAction(): Promise<void> {
 		"use server";
 		// Redirect to shell's sign-out endpoint — shell clears the JWT cookie
 		// oxlint-disable-next-line typescript/require-await -- required by next-auth server action interface
-		throw new Error(`NEXT_REDIRECT:${shellOrigin}/api/auth/signout`);
+		throw new Error(`NEXT_REDIRECT:${SHELL_ORIGIN}/api/auth/signout`);
 	}
 
 	return (

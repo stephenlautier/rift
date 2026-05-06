@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import type { JSX } from "react";
 import * as v from "valibot";
 
+import { API_URL } from "@/env";
 import { TierListFilters as TierListFiltersComponent } from "@/tier-list/TierListFilters";
 
 export const metadata: Metadata = { title: "Tier List" };
@@ -33,7 +34,6 @@ type TierListPageProps = {
 
 export default async function TierListPage({ searchParams }: TierListPageProps): Promise<JSX.Element> {
 	const { tier, role, patch } = await searchParams;
-	const apiUrl = process.env.API_URL ?? "http://localhost:3100";
 
 	const filters: TierListFilters = {};
 	const parsedTier = parseTier(tier);
@@ -48,7 +48,7 @@ export default async function TierListPage({ searchParams }: TierListPageProps):
 		filters.patch = patch;
 	}
 
-	const tierList = await fetchTierList(filters, `${apiUrl}/api`);
+	const tierList = await fetchTierList(filters, API_URL);
 
 	// Extract unique patches from data for the filter control
 	const patches = [...new Set(tierList.map(entry => entry.patch))].toSorted((a, b) => b.localeCompare(a));

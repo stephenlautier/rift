@@ -6,6 +6,7 @@ import type { JSX, ReactNode } from "react";
 import "./globals.css";
 
 import { auth, signOut } from "@/auth";
+import { AUTH_URL } from "@/env";
 
 export const metadata: Metadata = {
 	title: { default: "My Profile | Rift", template: "%s | Player | Rift" },
@@ -19,7 +20,7 @@ export default async function PlayerLayout({ children }: { children: ReactNode }
 
 	async function signOutAction(): Promise<void> {
 		"use server";
-		await signOut({ redirectTo: process.env.AUTH_URL ?? "/" });
+		await signOut({ redirectTo: AUTH_URL });
 	}
 
 	return (

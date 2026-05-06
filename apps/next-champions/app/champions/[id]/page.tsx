@@ -3,15 +3,16 @@ import { fetchChampion, fetchChampionAbilities, fetchChampionSkins } from "@rift
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
+import { API_URL } from "@/env";
+
 type ChampionPageProps = {
 	params: Promise<{ id: string }>;
 };
 
 export async function generateMetadata({ params }: ChampionPageProps): Promise<Metadata> {
 	const { id } = await params;
-	const apiUrl = process.env.API_URL ?? "http://localhost:3100";
 	try {
-		const champion = await fetchChampion(id, `${apiUrl}/api`);
+		const champion = await fetchChampion(id, API_URL);
 		return { title: champion.name };
 	} catch {
 		return { title: "Champion" };
@@ -20,12 +21,11 @@ export async function generateMetadata({ params }: ChampionPageProps): Promise<M
 
 export default async function ChampionDetailPage({ params }: ChampionPageProps): Promise<JSX.Element> {
 	const { id } = await params;
-	const apiUrl = process.env.API_URL ?? "http://localhost:3100";
 
 	const [champion, abilities, skins] = await Promise.all([
-		fetchChampion(id, `${apiUrl}/api`),
-		fetchChampionAbilities(id, `${apiUrl}/api`),
-		fetchChampionSkins(id, `${apiUrl}/api`),
+		fetchChampion(id, API_URL),
+		fetchChampionAbilities(id, API_URL),
+		fetchChampionSkins(id, API_URL),
 	]);
 
 	return (

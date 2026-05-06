@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type { JSX } from "react";
 
+import { API_URL } from "@/env";
+
 export const metadata: Metadata = { title: "My Profile" };
 
 function formatKda(kills: number, deaths: number, assists: number): string {
@@ -18,15 +20,14 @@ function formatDuration(sec: number): string {
 }
 
 export default async function PlayerDashboardPage(): Promise<JSX.Element> {
-	const apiUrl = process.env.API_URL ?? "http://localhost:3100";
 	const cookieStore = await cookies();
 	const cookieHeader = cookieStore.toString();
 
 	try {
 		const [player, playerChampions, matches] = await Promise.all([
-			fetchPlayerMe(cookieHeader, `${apiUrl}/api`),
-			fetchPlayerChampions(cookieHeader, `${apiUrl}/api`),
-			fetchPlayerMatches(cookieHeader, `${apiUrl}/api`),
+			fetchPlayerMe(cookieHeader, API_URL),
+			fetchPlayerChampions(cookieHeader, API_URL),
+			fetchPlayerMatches(cookieHeader, API_URL),
 		]);
 
 		const topMastery = [...playerChampions].toSorted((a, b) => b.masteryPoints - a.masteryPoints).slice(0, 3);
