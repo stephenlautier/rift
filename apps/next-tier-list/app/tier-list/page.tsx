@@ -57,8 +57,13 @@ export default async function TierListPage({ searchParams }: TierListPageProps):
 		<div className="space-y-6">
 			<h1 className="text-3xl font-bold tracking-tight">Tier List</h1>
 
-			{/* Client filter UI — reads/writes Jotai atoms */}
-			<TierListFiltersComponent patches={patches} />
+			{/* Client filter UI — syncs to URL search params which drive server re-renders */}
+			<TierListFiltersComponent
+				patches={patches}
+				currentTier={parsedTier}
+				currentRole={parsedRole}
+				currentPatch={patch ?? "latest"}
+			/>
 
 			{/* Server-rendered rows */}
 			<div className="rounded-xl border border-border overflow-hidden">

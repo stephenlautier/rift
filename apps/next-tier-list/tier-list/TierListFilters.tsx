@@ -1,11 +1,11 @@
 "use client";
 
 import type { ChampionRole, Tier } from "@rift/champion";
-import { useAtom } from "jotai";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 import type { ReactElement } from "react";
 
 import { FilterButton } from "./FilterButton";
-import { patchAtom, roleAtom, tierAtom } from "./tier-list.atoms";
 
 const TIERS: (Tier | "all")[] = ["all", "S", "A", "B", "C", "D"];
 const ROLES: (ChampionRole | "all")[] = ["all", "Top", "Jungle", "Mid", "ADC", "Support"];
@@ -25,12 +25,31 @@ const ROLE_INACTIVE = "border-border text-muted-foreground hover:border-foregrou
 
 type Props = {
 	patches: string[];
+	currentTier?: string;
+	currentRole?: string;
+	currentPatch?: string;
 };
 
-export function TierListFilters({ patches }: Props): ReactElement {
-	const [tier, setTier] = useAtom(tierAtom);
-	const [role, setRole] = useAtom(roleAtom);
-	const [patch, setPatch] = useAtom(patchAtom);
+export function TierListFilters({ patches, currentTier, currentRole, currentPatch = "latest" }: Props): ReactElement {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+
+	const updateParam = useCallback(
+		(key: string, value: string | undefined) => {
+			const params = new URLSearchParams(searchParams.toString());
+			if (!value || value === "all" || value === "latest") {
+				params.delete(key);
+			} else {
+				params.set(key, value);
+			}
+			router.push(`?${params.toString()}`, { scroll: false });
+		},
+		[router, searchParams],
+	);
+
+	const tier = currentTier ?? "all";
+	const role = currentRole ?? "all";
+	const patch = currentPatch;
 
 	return (
 		<div className="space-y-3 mb-8 p-4 rounded-xl border border-border bg-card">
@@ -42,7 +61,7 @@ export function TierListFilters({ patches }: Props): ReactElement {
 							key={t}
 							value={t}
 							active={tier === t}
-							onSelect={setTier}
+							onSelect={v => updateParam("tier", v)}
 							className={`px-3 py-1 rounded-md text-sm font-semibold border transition-colors ${
 								tier === t ? `${TIER_COLORS[t]} ring-1 ring-current` : TIER_INACTIVE
 							}`}>
@@ -60,7 +79,7 @@ export function TierListFilters({ patches }: Props): ReactElement {
 							key={r}
 							value={r}
 							active={role === r}
-							onSelect={setRole}
+							onSelect={v => updateParam("role", v)}
 							className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
 								role === r ? ROLE_ACTIVE : ROLE_INACTIVE
 							}`}>
@@ -77,7 +96,7 @@ export function TierListFilters({ patches }: Props): ReactElement {
 						<FilterButton
 							value="latest"
 							active={patch === "latest"}
-							onSelect={setPatch}
+							onSelect={v => updateParam("patch", v)}
 							className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
 								patch === "latest" ? ROLE_ACTIVE : ROLE_INACTIVE
 							}`}>
@@ -88,7 +107,7 @@ export function TierListFilters({ patches }: Props): ReactElement {
 								key={p}
 								value={p}
 								active={patch === p}
-								onSelect={setPatch}
+								onSelect={v => updateParam("patch", v)}
 								className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
 									patch === p ? ROLE_ACTIVE : ROLE_INACTIVE
 								}`}>

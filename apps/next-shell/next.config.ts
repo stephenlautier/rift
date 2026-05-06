@@ -10,6 +10,14 @@ const config: NextConfig = {
 	serverExternalPackages: ["@rift/ui/hydrate"],
 	async rewrites() {
 		return [
+			// ── Zone rewrites ───────────────────────────────────────────────────────
+			// Each zone uses a path-based assetPrefix (e.g. "/tier-list-static").
+			// In Next.js 15+, the zone natively serves /{prefix}/_next/... so the
+			// single /:path* catch-all below handles both page routes AND static
+			// assets (including webpack-hmr WebSocket upgrades). A separate
+			// /{prefix}/_next/:path* rewrite is NOT needed and was incorrectly
+			// stripping the prefix, causing 404s for the HMR endpoint.
+			// ── Zone page rewrites ───────────────────────────────────────────────────
 			// Champions zone
 			{
 				source: "/champions/:path*",

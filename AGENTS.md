@@ -209,3 +209,11 @@ Each app uses `@/` as an alias for its own `src/` directory.
 - [Community Dragon](https://www.communitydragon.org/) — additional assets
 - [wiki.leagueoflegends.com](https://wiki.leagueoflegends.com/en-us/) — lore, ability details
 - Reference tier lists: [mobalytics.gg/lol/tier-list](https://mobalytics.gg/lol/tier-list), [u.gg/lol/tier-list](https://u.gg/lol/tier-list)
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# Next.js: ALWAYS read docs before coding
+
+Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated — the docs are the source of truth.
+
+<!-- END:nextjs-agent-rules -->

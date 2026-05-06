@@ -1,12 +1,14 @@
 import type { NextConfig } from "next";
 
-const assetPrefix =
-	process.env.NODE_ENV === "production"
-		? "/tier-list-static"
-		: (process.env.NEXT_PUBLIC_TIER_LIST_URL ?? "http://localhost:3002");
+const SHELL_ORIGIN = process.env.SHELL_ORIGIN ?? "http://localhost:3000";
 
 const config = {
-	assetPrefix,
+	// Path-based assetPrefix. In Next.js 15+ the zone natively serves
+	// /{prefix}/_next/... so the shell's single catch-all rewrite handles both
+	// page routes and static assets (including WebSocket HMR upgrades).
+	assetPrefix: "/tier-list-static",
+	// Allow the shell origin to access this dev server (HMR, hot-reload).
+	allowedDevOrigins: [new URL(SHELL_ORIGIN).host],
 	transpilePackages: ["@rift/next-shared"],
 	...(process.env.DOCKER_BUILD === "1" ? { output: "standalone" as const } : {}),
 } satisfies NextConfig;
