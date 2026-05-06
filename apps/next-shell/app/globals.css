@@ -6,3 +6,10 @@
 @import "tw-animate-css";
 @import "@rift/styles/tokens.css";
 @import "@rift/styles/components.css";
+
+/*
+ * Scan @rift/next-shared components so Tailwind generates classes used in
+ * Header, Nav, ThemeSwitcher, and SignOutButton. These live outside this app's
+ * source tree so Tailwind's auto-scanner would miss them.
+ */
+@source "../../../libs/next-shared/src";
