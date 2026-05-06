@@ -3,6 +3,10 @@
 import type { JSX, ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { THEME_COOKIE_NAME, THEME_STORAGE_KEY } from "./constants";
+
+export { THEME_COOKIE_NAME } from "./constants";
+
 export type ThemeMode = "system" | "light" | "dark";
 
 type ThemeContextValue = {
@@ -13,8 +17,6 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-export const THEME_COOKIE_NAME = "rift-theme";
-const THEME_STORAGE_KEY = "rift-theme";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 export function isThemeMode(value: unknown): value is ThemeMode {

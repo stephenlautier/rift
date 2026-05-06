@@ -14,6 +14,7 @@ export { SignOutButton } from "./components/SignOutButton";
 export { ThemeProvider, useTheme, THEME_COOKIE_NAME } from "./theme/ThemeProvider";
 export type { ThemeMode } from "./theme/ThemeProvider";
 export { ThemeSwitcher } from "./theme/ThemeSwitcher";
+export { ThemeScript } from "./theme/ThemeScript";
 
 // Providers (client wrapper)
 export { Providers } from "./providers/Providers";

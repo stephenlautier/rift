@@ -1,4 +1,4 @@
-import { Header, Providers, ThemeSwitcher, THEME_COOKIE_NAME } from "@rift/next-shared";
+import { Header, Providers, ThemeSwitcher, ThemeScript, THEME_COOKIE_NAME } from "@rift/next-shared";
 import type { ThemeMode } from "@rift/next-shared";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -26,7 +26,9 @@ export default async function TierListLayout({ children }: { children: ReactNode
 
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<head />
+			<head>
+				<ThemeScript />
+			</head>
 			<body className="min-h-screen bg-background text-foreground antialiased">
 				<Providers initialTheme={initialTheme}>
 					<div className="min-h-screen flex flex-col">
