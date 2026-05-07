@@ -2,7 +2,7 @@ import { getSession } from "@auth/core";
 import type { Session } from "@auth/core/types";
 import { authjsConfig } from "@rift/auth";
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 
 /**
  * Server function that reads the Auth.js session from the incoming request
@@ -13,6 +13,6 @@ import { getWebRequest } from "@tanstack/react-start/server";
  * available to all descendant routes via `context.session`.
  */
 export const getServerSession = createServerFn().handler(async (): Promise<Session | null> => {
-	const request = getWebRequest();
+	const request = getRequest();
 	return getSession(request, authjsConfig);
 });

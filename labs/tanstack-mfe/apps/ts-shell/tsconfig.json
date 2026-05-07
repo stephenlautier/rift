@@ -2,12 +2,16 @@
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "lib": ["ES2023", "dom", "dom.iterable"],
+    "lib": ["ES2022", "dom", "dom.iterable"],
     "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noUncheckedSideEffectImports": true,
     "noEmit": true,
+    "types": ["vite/client"],
     "paths": {
       "@/*": ["./app/*"]
     }
   },
-  "include": ["app", "app.config.ts"]
+  "include": ["app", "vite.config.ts"]
 }

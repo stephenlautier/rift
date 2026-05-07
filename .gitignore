@@ -78,3 +78,12 @@ dist
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# tanstack
+.nitro
+.tanstack
+.wrangler
+.output
+.vinxi
+__unconfig*
+todos.json

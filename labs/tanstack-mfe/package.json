@@ -1,0 +1,16 @@
+{
+  "name": "@rift/tanstack-mfe",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cd ../../ && pnpm kill-ports && nx run-many -t dev --projects=ts-shell,ts-champions,ts-tier-list,ts-player,api --parallel",
+    "dev:shell": "pnpm --filter @rift/ts-shell run dev",
+    "dev:champions": "pnpm --filter @rift/ts-champions run dev",
+    "dev:tier-list": "pnpm --filter @rift/ts-tier-list run dev",
+    "dev:player": "pnpm --filter @rift/ts-player run dev",
+    "dev:api": "pnpm --filter @rift/api run dev",
+    "build": "cd ../../ && nx run-many -t build --projects=ts-champions,ts-tier-list,ts-player,ts-shell --parallel=false",
+    "preview": "cd ../../ && nx run-many -t preview --projects=ts-shell,ts-champions,ts-tier-list,ts-player --parallel"
+  }
+}

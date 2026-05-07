@@ -1,9 +1,9 @@
-import { fetchPlayerBySubject, fetchPlayerChampions, fetchPlayerMatches, fetchChampions } from "@rift/data-access";
+import { fetchPlayerMe, fetchPlayerChampions, fetchPlayerMatches, fetchChampions } from "@rift/data-access";
 // Stencil React output-target wrappers
 import { LolChampionCard } from "@rift/ui/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import type { JSX } from "react";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3100";
@@ -13,14 +13,14 @@ const API_URL = process.env.API_URL ?? "http://localhost:3100";
  * Forwarding the Cookie header ensures the API can identify the session.
  */
 const fetchPlayerProfile = createServerFn().handler(async () => {
-	const request = getWebRequest();
+	const request = getRequest();
 	const cookie = request.headers.get("cookie") ?? "";
 
-	const [me, allChampions] = await Promise.all([fetchPlayerBySubject({ cookie }, API_URL), fetchChampions(API_URL)]);
+	const [me, allChampions] = await Promise.all([fetchPlayerMe(cookie, API_URL), fetchChampions(API_URL)]);
 
 	const [playerChampions, matches] = await Promise.all([
-		fetchPlayerChampions({ playerId: me.id, cookie }, API_URL),
-		fetchPlayerMatches({ playerId: me.id, cookie }, API_URL),
+		fetchPlayerChampions(cookie, API_URL),
+		fetchPlayerMatches(cookie, API_URL),
 	]);
 
 	const byId = new Map(allChampions.map(c => [c.id, c]));

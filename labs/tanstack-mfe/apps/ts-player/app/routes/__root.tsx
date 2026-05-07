@@ -1,12 +1,21 @@
 import type { Session } from "@auth/core/types";
 import { Header, Providers } from "@rift/ts-shared";
 import type { NavZone, RenderLinkFn, RenderLinkProps } from "@rift/ts-shared";
-import { createRootRouteWithContext, HeadContent, Link, Outlet, redirect, Scripts } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import type { JSX } from "react";
+import { createRootRouteWithContext, HeadContent, Link, redirect, Scripts } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createServerFn } from "@tanstack/react-start";
+import type { ReactNode } from "react";
 
-import { getServerSession } from "../lib/session.server";
 import appCss from "../styles/globals.css?url";
+
+/**
+ * Wrap getServerSession in a createServerFn so the *.server.* module
+ * is never statically imported into the client bundle.
+ */
+const $getSession = createServerFn().handler(async (): Promise<Session | null> => {
+	const { getServerSession } = await import("../lib/session.server");
+	return getServerSession();
+});
 
 type RouterContext = {
 	session: Session | null;
@@ -40,20 +49,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 	 * with a callbackUrl so they return here after sign-in.
 	 */
 	beforeLoad: async ({ location }) => {
-		const session = await getServerSession();
+		const session = await $getSession();
 		if (!session?.user) {
 			throw redirect({ to: `/login?callbackUrl=${encodeURIComponent(location.href)}` });
 		}
 		return { session };
 	},
-	component: RootComponent,
+	shellComponent: RootDocument,
 });
 
 function handleSignOut(): void {
 	globalThis.location.href = "/api/auth/signout";
 }
 
-function RootComponent(): JSX.Element {
+function RootDocument({ children }: { children: ReactNode }) {
 	const { session } = Route.useRouteContext();
 	const userName = session?.user?.name ?? undefined;
 
@@ -65,9 +74,7 @@ function RootComponent(): JSX.Element {
 			<body>
 				<Providers>
 					<Header currentZone={CURRENT_ZONE} renderLink={renderLink} userName={userName} onSignOut={handleSignOut} />
-					<main className="container mx-auto px-4 py-8">
-						<Outlet />
-					</main>
+					<main className="container mx-auto px-4 py-8">{children}</main>
 				</Providers>
 				<TanStackRouterDevtools />
 				<Scripts />

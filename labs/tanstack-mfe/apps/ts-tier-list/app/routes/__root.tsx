@@ -1,8 +1,8 @@
 import { Header, Providers } from "@rift/ts-shared";
 import type { NavZone, RenderLinkFn, RenderLinkProps } from "@rift/ts-shared";
-import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import type { JSX } from "react";
+import { createRootRoute, HeadContent, Link, Scripts } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import type { ReactNode } from "react";
 
 import appCss from "../styles/globals.css?url";
 
@@ -28,10 +28,10 @@ export const Route = createRootRoute({
 		meta: [{ charSet: "utf8" }, { name: "viewport", content: "width=device-width, initial-scale=1" }],
 		links: [{ rel: "stylesheet", href: appCss }],
 	}),
-	component: RootComponent,
+	shellComponent: RootDocument,
 });
 
-function RootComponent(): JSX.Element {
+function RootDocument({ children }: { children: ReactNode }) {
 	return (
 		<html lang="en">
 			<head>
@@ -40,9 +40,7 @@ function RootComponent(): JSX.Element {
 			<body>
 				<Providers>
 					<Header currentZone={CURRENT_ZONE} renderLink={renderLink} />
-					<main className="container mx-auto px-4 py-8">
-						<Outlet />
-					</main>
+					<main className="container mx-auto px-4 py-8">{children}</main>
 				</Providers>
 				<TanStackRouterDevtools />
 				<Scripts />

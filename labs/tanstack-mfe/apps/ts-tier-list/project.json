@@ -25,21 +25,21 @@
       "executor": "nx:run-commands",
       "continuous": true,
       "options": {
-        "command": "pnpm run start",
+        "command": "pnpm run preview",
         "cwd": "labs/tanstack-mfe/apps/ts-tier-list"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm oxlint app app.config.ts",
+        "command": "pnpm oxlint app vite.config.ts",
         "cwd": "labs/tanstack-mfe/apps/ts-tier-list"
       }
     },
     "fmt": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "pnpm oxfmt app app.config.ts",
+        "command": "pnpm oxfmt app vite.config.ts",
         "cwd": "labs/tanstack-mfe/apps/ts-tier-list"
       }
     }

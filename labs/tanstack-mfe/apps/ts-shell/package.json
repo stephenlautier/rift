@@ -4,10 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev --port ${PORT:-3000}",
-    "build": "vinxi build",
-    "start": "vinxi start",
-    "generate-routes": "tsr generate"
+    "dev": "vite dev --port ${PORT:-3000}",
+    "build": "vite build",
+    "preview": "vite preview --port ${PORT:-3000}"
   },
   "dependencies": {
     "@auth/core": "catalog:",
@@ -19,6 +18,7 @@
     "clsx": "catalog:",
     "jotai": "catalog:",
     "lucide-react": "catalog:",
+    "nitro": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwind-merge": "catalog:",
@@ -26,13 +26,14 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
-    "@tanstack/router-devtools": "catalog:",
+    "@tanstack/react-router-devtools": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
     "oxlint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vinxi": "catalog:"
+    "vite": "catalog:"
   }
 }

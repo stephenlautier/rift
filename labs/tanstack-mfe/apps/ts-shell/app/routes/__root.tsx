@@ -1,18 +1,24 @@
 import { Header, Providers } from "@rift/ts-shared";
 import type { NavZone, RenderLinkFn, RenderLinkProps } from "@rift/ts-shared";
-import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import type { JSX } from "react";
+import { createRootRoute, HeadContent, Link, Scripts } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createServerFn } from "@tanstack/react-start";
+import type { ReactNode } from "react";
 
-import { getServerSession } from "../lib/session.server";
 import appCss from "../styles/globals.css?url";
+
+/**
+ * Wrap getServerSession in a createServerFn so the *.server.* module
+ * is never statically imported into the client bundle.
+ * Dynamic import inside the handler body is stripped by the plugin.
+ */
+const $getSession = createServerFn().handler(async () => {
+	const { getServerSession } = await import("../lib/session.server");
+	return getServerSession();
+});
 
 const CURRENT_ZONE: NavZone = "shell";
 
-/**
- * Shell's renderLink: all nav links are intra-zone for / and /login,
- * but /champions, /tier-list, /player cross into other zones → <a href>.
- */
 const renderLink: RenderLinkFn = ({ href, zone, children, className, ariaCurrent }: RenderLinkProps) => {
 	if (zone === CURRENT_ZONE || href === "/" || href === "/login") {
 		return (
@@ -34,15 +40,15 @@ export const Route = createRootRoute({
 		links: [{ rel: "stylesheet", href: appCss }],
 	}),
 	beforeLoad: async () => {
-		const session = await getServerSession();
+		const session = await $getSession();
 		return { session };
 	},
-	component: RootComponent,
+	shellComponent: RootDocument,
 });
 
 async function handleSignOut(): Promise<void> {
 	const csrfRes = await fetch("/api/auth/csrf");
-	const { csrfToken } = (await csrfRes.json()) as { csrfToken: string };
+	const { csrfToken } = (await csrfRes.json()) as Record<string, string>;
 	await fetch("/api/auth/signout", {
 		method: "POST",
 		headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -51,7 +57,7 @@ async function handleSignOut(): Promise<void> {
 	globalThis.location.href = "/";
 }
 
-function RootComponent(): JSX.Element {
+function RootDocument({ children }: { children: ReactNode }) {
 	const { session } = Route.useRouteContext();
 
 	return (
@@ -67,9 +73,7 @@ function RootComponent(): JSX.Element {
 						userName={session?.user?.name ?? null}
 						onSignOut={session ? handleSignOut : undefined}
 					/>
-					<main className="container mx-auto px-4 py-8">
-						<Outlet />
-					</main>
+					<main className="container mx-auto px-4 py-8">{children}</main>
 				</Providers>
 				<TanStackRouterDevtools />
 				<Scripts />

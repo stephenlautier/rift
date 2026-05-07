@@ -8,7 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
  * Auth.js uses `authjsConfig.basePath` ("/api/auth") to strip the prefix
  * before matching internal handlers (e.g. /csrf, /signin, /callback/*, /signout).
  *
- * This route takes precedence over the Nitro proxy routeRules in app.config.ts
+ * This route takes precedence over the Nitro proxy routeRules in vite.config.ts
  * because TanStack Start's router handles requests before Nitro routeRules apply.
  */
 export const Route = createFileRoute("/api/auth/$")({

@@ -1,17 +1,11 @@
 import type { ChampionRole, Tier } from "@rift/champion";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import type { ChangeEvent, JSX, MouseEvent } from "react";
-import { useCallback } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useCallback, useState } from "react";
+import type { JSX } from "react";
 
 import type { RoleFilter, TierFilter } from "./parse-filters";
 
-/** Jotai atoms for tier list filter state — persisted in sessionStorage. */
-export const tierAtom = atomWithStorage<TierFilter>("rift-tier-filter", "all");
-export const roleAtom = atomWithStorage<RoleFilter>("rift-role-filter", "all");
-export const patchAtom = atomWithStorage<string>("rift-patch-filter", "latest");
-
-type TierEntry = {
+type TierListEntry = {
 	id: string;
 	tier: Tier;
 	role: ChampionRole;
@@ -26,7 +20,7 @@ type TierEntry = {
 };
 
 type TierListViewProps = {
-	entries: TierEntry[];
+	entries: TierListEntry[];
 	patches: string[];
 	initialTier: TierFilter;
 	initialRole: RoleFilter;
@@ -37,21 +31,13 @@ const TIERS: Tier[] = ["S", "A", "B", "C", "D"];
 const ROLES: ChampionRole[] = ["Top", "Jungle", "Mid", "ADC", "Support"];
 
 const TIER_COLORS: Record<Tier, string> = {
-	S: "text-yellow-500 bg-yellow-500/10 border-yellow-500/30",
-	A: "text-green-500 bg-green-500/10 border-green-500/30",
-	B: "text-blue-500 bg-blue-500/10 border-blue-500/30",
-	C: "text-orange-500 bg-orange-500/10 border-orange-500/30",
-	D: "text-red-500 bg-red-500/10 border-red-500/30",
+	S: "bg-yellow-500 text-yellow-950",
+	A: "bg-green-500 text-green-950",
+	B: "bg-blue-500 text-blue-950",
+	C: "bg-orange-500 text-orange-950",
+	D: "bg-red-500 text-red-950",
 };
 
-/**
- * Client-side tier list view with Jotai filter state.
- *
- * The server loader already filtered data using URL search params — this
- * component handles UX refinement (instant filter toggle) without another
- * round trip. The atomWithStorage ensures filters survive navigation within
- * the tier-list zone.
- */
 export function TierListView({
 	entries,
 	patches,
@@ -59,141 +45,128 @@ export function TierListView({
 	initialRole,
 	initialPatch,
 }: TierListViewProps): JSX.Element {
-	const [tier, setTier] = useAtom(tierAtom);
-	const [role, setRole] = useAtom(roleAtom);
-	const [patch, setPatch] = useAtom(patchAtom);
+	const navigate = useNavigate({ from: "/tier-list/" });
+	const [tier, setTier] = useState<TierFilter>(initialTier);
+	const [role, setRole] = useState<RoleFilter>(initialRole);
+	const [patch, setPatch] = useState(initialPatch);
 
-	// Sync atoms with SSR-resolved values on first render
-	const effectiveTier = tier === "all" ? initialTier : tier;
-	const effectiveRole = role === "all" ? initialRole : role;
-	const effectivePatch = patch === "latest" ? initialPatch : patch;
-
-	const filtered = entries.filter(e => {
-		if (effectiveTier !== "all" && e.tier !== effectiveTier) {
-			return false;
-		}
-		if (effectiveRole !== "all" && e.role !== effectiveRole) {
-			return false;
-		}
-		if (effectivePatch && e.patch !== effectivePatch) {
-			return false;
-		}
-		return true;
-	});
-
-	// Stable event-delegation handlers — read filter value from data-* attribute
-	const handleTierClick = useCallback(
-		(e: MouseEvent<HTMLButtonElement>): void => {
-			const val = e.currentTarget.dataset.tier as TierFilter | undefined;
-			if (val) {
-				setTier(val);
-			}
+	const applyFilters = useCallback(
+		(nextTier: TierFilter, nextRole: RoleFilter, nextPatch: string) => {
+			void navigate({
+				search: {
+					tier: nextTier === "all" ? undefined : nextTier,
+					role: nextRole === "all" ? undefined : nextRole,
+					patch: nextPatch === "latest" ? undefined : nextPatch,
+				},
+			});
 		},
-		[setTier],
+		[navigate],
 	);
 
-	const handleRoleClick = useCallback(
-		(e: MouseEvent<HTMLButtonElement>): void => {
-			const val = e.currentTarget.dataset.role as RoleFilter | undefined;
-			if (val) {
-				setRole(val);
-			}
-		},
-		[setRole],
-	);
+	const handleTier = (value: TierFilter) => {
+		setTier(value);
+		applyFilters(value, role, patch);
+	};
 
-	const handlePatchChange = useCallback(
-		(e: ChangeEvent<HTMLSelectElement>): void => {
-			setPatch(e.target.value);
-		},
-		[setPatch],
-	);
+	const handleRole = (value: RoleFilter) => {
+		setRole(value);
+		applyFilters(tier, value, patch);
+	};
+
+	const handlePatch = (value: string) => {
+		setPatch(value);
+		applyFilters(tier, role, value);
+	};
 
 	return (
 		<div className="space-y-6">
-			{/* Filter bar */}
-			<div className="flex flex-wrap gap-3">
-				{/* Tier filter */}
-				<div className="flex items-center gap-1.5">
-					<span className="text-xs font-medium text-muted-foreground">Tier</span>
-					{(["all", ...TIERS] as (TierFilter | "all")[]).map(t => (
+			{/* Filters */}
+			<div className="flex flex-wrap gap-4">
+				<div className="flex items-center gap-2">
+					<span className="text-sm font-medium text-muted-foreground">Tier:</span>
+					{(["all", ...TIERS] as const).map(t => (
 						<button
 							key={t}
 							type="button"
-							data-tier={t}
-							onClick={handleTierClick}
-							className={`text-xs px-2 py-1 rounded border transition-colors ${
-								effectiveTier === t
-									? "bg-primary text-primary-foreground border-primary"
-									: "border-border text-muted-foreground hover:text-foreground"
-							}`}>
+							onClick={() => handleTier(t)}
+							className={`rounded px-2.5 py-1 text-sm font-semibold transition-colors ${tier === t ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>
 							{t === "all" ? "All" : t}
 						</button>
 					))}
 				</div>
-				{/* Role filter */}
-				<div className="flex items-center gap-1.5">
-					<span className="text-xs font-medium text-muted-foreground">Role</span>
-					{(["all", ...ROLES] as (RoleFilter | "all")[]).map(r => (
+
+				<div className="flex items-center gap-2">
+					<span className="text-sm font-medium text-muted-foreground">Role:</span>
+					{(["all", ...ROLES] as const).map(r => (
 						<button
 							key={r}
 							type="button"
-							data-role={r}
-							onClick={handleRoleClick}
-							className={`text-xs px-2 py-1 rounded border transition-colors ${
-								effectiveRole === r
-									? "bg-primary text-primary-foreground border-primary"
-									: "border-border text-muted-foreground hover:text-foreground"
-							}`}>
+							onClick={() => handleRole(r)}
+							className={`rounded px-2.5 py-1 text-sm font-semibold transition-colors ${role === r ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>
 							{r === "all" ? "All" : r}
 						</button>
 					))}
 				</div>
-				{/* Patch filter */}
-				<div className="flex items-center gap-1.5">
-					<span className="text-xs font-medium text-muted-foreground">Patch</span>
-					<select
-						value={effectivePatch}
-						onChange={handlePatchChange}
-						className="text-xs rounded border border-border bg-background px-2 py-1">
-						<option value="latest">Latest</option>
-						{patches.map(p => (
-							<option key={p} value={p}>
+
+				{patches.length > 0 && (
+					<div className="flex items-center gap-2">
+						<span className="text-sm font-medium text-muted-foreground">Patch:</span>
+						{["latest", ...patches].map(p => (
+							<button
+								key={p}
+								type="button"
+								onClick={() => handlePatch(p)}
+								className={`rounded px-2.5 py-1 text-sm transition-colors ${patch === p ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>
 								{p}
-							</option>
+							</button>
 						))}
-					</select>
-				</div>
-			</div>
-
-			{/* Results count */}
-			<p className="text-sm text-muted-foreground">{filtered.length} entries</p>
-
-			{/* Tier list rows */}
-			<div className="space-y-1">
-				{filtered.map(entry => (
-					<div
-						key={entry.id}
-						className="flex items-center gap-4 rounded-lg border border-border p-3 hover:bg-accent/50 transition-colors">
-						<span
-							className={`text-sm font-bold w-8 text-center rounded border ${TIER_COLORS[entry.tier] ?? ""} py-0.5`}>
-							{entry.tier}
-						</span>
-						<img
-							src={entry.champion.splashArtUrl}
-							alt={entry.champion.name}
-							className="h-8 w-8 rounded-full object-cover object-top"
-						/>
-						{/* Cross-zone link to champion detail */}
-						<a href={`/champions/${entry.champion.id}`} className="font-medium hover:underline flex-1">
-							{entry.champion.name}
-						</a>
-						<span className="text-xs text-muted-foreground">{entry.role}</span>
-						<span className="text-xs text-muted-foreground">{(entry.winRate * 100).toFixed(1)}% WR</span>
-						<span className="text-xs text-muted-foreground">{(entry.pickRate * 100).toFixed(1)}% PR</span>
 					</div>
-				))}
+				)}
 			</div>
+
+			{/* Table */}
+			{entries.length === 0 ? (
+				<p className="text-muted-foreground">No champions match the selected filters.</p>
+			) : (
+				<div className="rounded-md border">
+					<table className="w-full text-sm">
+						<thead>
+							<tr className="border-b bg-muted/50">
+								<th className="px-4 py-3 text-left font-medium">Champion</th>
+								<th className="px-4 py-3 text-left font-medium">Tier</th>
+								<th className="px-4 py-3 text-left font-medium">Role</th>
+								<th className="px-4 py-3 text-right font-medium">Win Rate</th>
+								<th className="px-4 py-3 text-right font-medium">Pick Rate</th>
+							</tr>
+						</thead>
+						<tbody>
+							{entries.map(entry => (
+								<tr key={entry.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+									<td className="px-4 py-3">
+										<div className="flex items-center gap-3">
+											<img
+												src={entry.champion.splashArtUrl}
+												alt={entry.champion.name}
+												className="h-8 w-8 rounded-full object-cover"
+											/>
+											<span className="font-medium">{entry.champion.name}</span>
+										</div>
+									</td>
+									<td className="px-4 py-3">
+										<span
+											className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${TIER_COLORS[entry.tier]}`}>
+											{entry.tier}
+										</span>
+									</td>
+									<td className="px-4 py-3 text-muted-foreground">{entry.role}</td>
+									<td className="px-4 py-3 text-right tabular-nums">{(entry.winRate * 100).toFixed(1)}%</td>
+									<td className="px-4 py-3 text-right tabular-nums">{(entry.pickRate * 100).toFixed(1)}%</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			)}
 		</div>
 	);
 }

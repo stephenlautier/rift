@@ -4,9 +4,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { JSX } from "react";
 
-import { parseRole, parseTier } from "../tier-list/parse-filters";
-import type { RoleFilter, TierFilter } from "../tier-list/parse-filters";
-import { TierListView } from "../tier-list/TierListView";
+import { parseRole, parseTier } from "@/tier-list/parse-filters";
+import type { RoleFilter, TierFilter } from "@/tier-list/parse-filters";
+import { TierListView } from "@/tier-list/TierListView";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3100";
 

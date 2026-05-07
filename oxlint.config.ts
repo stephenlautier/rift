@@ -329,5 +329,7 @@ export default defineConfig({
 		"libs/ui/src/react/**",
 		"libs/player-ui/src/components.d.ts",
 		"libs/player-ui/src/react/**",
+		// TanStack Router generated route tree — contains bare `/* eslint-disable */` by design
+		"**/routeTree.gen.ts",
 	],
 });
