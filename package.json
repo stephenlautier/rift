@@ -6,6 +6,7 @@
     "dev": "pnpm kill-ports && nx run-many -t dev --projects=shell,api --parallel",
     "dev:next": "pnpm kill-ports && nx run-many -t dev --projects=next-shell,next-champions,next-tier-list,next-player,api --parallel",
     "dev:tss": "pnpm kill-ports && nx run-many -t dev --projects=ts-shell,ts-champions,ts-tier-list,ts-player,api --parallel",
+    "start:next": "pnpm kill-ports && nx run-many -t start --projects=next-shell,next-champions,next-tier-list,next-player,api --parallel",
     "dev:shell": "nx run shell:dev",
     "dev:next-shell": "nx run next-shell:dev",
     "dev:api": "nx run api:dev",

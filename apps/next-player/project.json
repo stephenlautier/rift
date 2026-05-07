@@ -6,20 +6,30 @@
   "tags": ["type:app", "scope:player"],
   "targets": {
     "build": {
-      "executor": "@nx/next:build",
+      "executor": "nx:run-commands",
       "options": {
-        "root": "apps/next-player",
-        "outputPath": "dist/apps/next-player"
+        "command": "pnpm build",
+        "cwd": "apps/next-player"
       },
+      "outputs": ["{projectRoot}/.next"],
       "dependsOn": ["^build"]
     },
     "dev": {
-      "executor": "@nx/next:server",
+      "executor": "nx:run-commands",
+      "continuous": true,
       "options": {
-        "buildTarget": "next-player:build",
-        "dev": true,
-        "port": 3003
+        "command": "pnpm dev",
+        "cwd": "apps/next-player"
       }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "pnpm start",
+        "cwd": "apps/next-player"
+      },
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "nx:run-commands",
