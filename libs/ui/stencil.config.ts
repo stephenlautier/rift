@@ -1,9 +1,14 @@
+import { nextServerOutputTarget } from "@rift/stenciljs-next-output-targets";
 import { Config } from "@stencil/core";
 import { reactOutputTarget } from "@stencil/react-output-target";
 
 export const config: Config = {
 	namespace: "rift-ui",
 	outputTargets: [
+		nextServerOutputTarget({
+			outDir: "src/react",
+			hydrateModule: "@rift/ui/hydrate",
+		}),
 		reactOutputTarget({
 			outDir: "src/react",
 			// Tell the React wrapper how to reach the SSR hydrate module so the

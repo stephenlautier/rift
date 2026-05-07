@@ -59,6 +59,7 @@
     "generate": "stencil generate"
   },
   "dependencies": {
+    "@rift/stenciljs-next-output-targets": "workspace:*",
     "@stencil/core": "4.43.4",
     "@stencil/react-output-target": "1.5.2"
   },

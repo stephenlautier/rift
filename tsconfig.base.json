@@ -26,7 +26,8 @@
       "@rift/ui/dist/components/*.js": ["./libs/ui/dist/components/*"],
       "@rift/ui/dist/components/*": ["./libs/ui/dist/components/*"],
       "@rift/data-access": ["./libs/data-access/src/index.ts"],
-      "@rift/ts-shared": ["./labs/tanstack-mfe/libs/ts-shared/src/index.ts"]
+      "@rift/ts-shared": ["./labs/tanstack-mfe/libs/ts-shared/src/index.ts"],
+      "@rift/stenciljs-next-output-targets": ["./libs/stenciljs-next-output-targets/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "dist", "build", ".vike", "coverage"]

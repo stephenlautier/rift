@@ -1,0 +1,23 @@
+{
+  "name": "@rift/stenciljs-next-output-targets",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "devDependencies": {
+    "@stencil/core": "catalog:",
+    "tsdown": "catalog:"
+  },
+  "peerDependencies": {
+    "@stencil/core": "4.43.4"
+  }
+}
