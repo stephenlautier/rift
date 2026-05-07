@@ -292,6 +292,28 @@ export default defineConfig({
 				"typescript/explicit-function-return-type": "off",
 			},
 		},
+		{
+			// libs/** and labs/tanstack-mfe/libs/** — library packages are not
+			// processed by React Fast Refresh, so only-export-components is noise.
+			// These files legitimately co-locate hooks, type guards, and context
+			// providers in the same module.
+			files: ["libs/**/*.ts", "libs/**/*.tsx", "labs/tanstack-mfe/libs/**/*.ts", "labs/tanstack-mfe/libs/**/*.tsx"],
+			rules: {
+				"react/only-export-components": "off",
+			},
+		},
+		{
+			// TanStack Start app files — allow default exports (required by vinxi/file-based router)
+			// and relax a11y click handlers (Stencil output components trigger them).
+			files: ["labs/tanstack-mfe/apps/**/*.ts", "labs/tanstack-mfe/apps/**/*.tsx"],
+			rules: {
+				"import/no-default-export": "off",
+				// TanStack Start file routes are loaded by vinxi; explicit return types are noise
+				"typescript/explicit-function-return-type": "off",
+				// Route components, loader functions, and server functions are framework contracts
+				"react/only-export-components": "off",
+			},
+		},
 	],
 	ignorePatterns: [
 		"dist/**",

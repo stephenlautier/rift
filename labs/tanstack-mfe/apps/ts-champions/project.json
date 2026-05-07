@@ -1,0 +1,47 @@
+{
+  "name": "ts-champions",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "labs/tanstack-mfe/apps/ts-champions/app",
+  "tags": ["type:app", "scope:ts-champions"],
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "pnpm run dev",
+        "cwd": "labs/tanstack-mfe/apps/ts-champions"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm run build",
+        "cwd": "labs/tanstack-mfe/apps/ts-champions"
+      },
+      "dependsOn": ["^build"]
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "pnpm run start",
+        "cwd": "labs/tanstack-mfe/apps/ts-champions"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxlint app app.config.ts",
+        "cwd": "labs/tanstack-mfe/apps/ts-champions"
+      }
+    },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxfmt app app.config.ts",
+        "cwd": "labs/tanstack-mfe/apps/ts-champions"
+      }
+    }
+  }
+}

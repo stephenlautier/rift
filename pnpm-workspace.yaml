@@ -1,6 +1,8 @@
 packages:
   - "apps/*"
   - "libs/*"
+  - "labs/tanstack-mfe/apps/*"
+  - "labs/tanstack-mfe/libs/*"
 allowBuilds:
   nx: false
 
@@ -20,6 +22,12 @@ catalog:
   # ── Auth ─────────────────────────────────────────────────────────────────────
   "@auth/core": ^0.41.1
   dotenv: ^17.4.2
+
+  # ── TanStack Start ────────────────────────────────────────────────────────────
+  "@tanstack/react-start": ^1.121.12
+  "@tanstack/react-router": ^1.121.12
+  "@tanstack/router-devtools": ^1.121.12
+  vinxi: ^0.5.3
 
   # ── UI / Styling ─────────────────────────────────────────────────────────────
   clsx: ^2.1.1

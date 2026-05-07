@@ -1,0 +1,40 @@
+{
+  "name": "@rift/ts-player",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev --port ${PORT:-3003}",
+    "build": "vinxi build",
+    "start": "vinxi start",
+    "generate-routes": "tsr generate"
+  },
+  "dependencies": {
+    "@auth/core": "catalog:",
+    "@rift/auth": "workspace:*",
+    "@rift/data-access": "workspace:*",
+    "@rift/styles": "workspace:*",
+    "@rift/ts-shared": "workspace:*",
+    "@rift/ui": "workspace:*",
+    "@tanstack/react-router": "catalog:",
+    "@tanstack/react-start": "catalog:",
+    "clsx": "catalog:",
+    "jotai": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tw-animate-css": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@tanstack/router-devtools": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "oxlint": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vinxi": "catalog:"
+  }
+}
