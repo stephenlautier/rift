@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port ${PORT:-3000}",
+    "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview --port ${PORT:-3000}"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@auth/core": "catalog:",
