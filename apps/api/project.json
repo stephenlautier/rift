@@ -23,6 +23,7 @@
     },
     "start": {
       "executor": "nx:run-commands",
+      "continuous": true,
       "options": {
         "command": "pnpm start",
         "cwd": "apps/api"
