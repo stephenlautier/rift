@@ -1,0 +1,38 @@
+{
+  "name": "stenciljs-next-output-targets",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/stenciljs-next-output-targets/src",
+  "tags": ["type:lib", "scope:tooling"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm tsdown",
+        "cwd": "libs/stenciljs-next-output-targets"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxlint src/",
+        "cwd": "libs/stenciljs-next-output-targets"
+      }
+    },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxfmt src/",
+        "cwd": "libs/stenciljs-next-output-targets"
+      }
+    },
+    "fmt:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm oxfmt --check src/",
+        "cwd": "libs/stenciljs-next-output-targets"
+      }
+    }
+  }
+}
