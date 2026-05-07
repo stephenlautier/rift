@@ -6,20 +6,30 @@
   "tags": ["type:app", "scope:tier-list"],
   "targets": {
     "build": {
-      "executor": "@nx/next:build",
+      "executor": "nx:run-commands",
       "options": {
-        "root": "apps/next-tier-list",
-        "outputPath": "dist/apps/next-tier-list"
+        "command": "pnpm build",
+        "cwd": "apps/next-tier-list"
       },
+      "outputs": ["{projectRoot}/.next"],
       "dependsOn": ["^build"]
     },
     "dev": {
-      "executor": "@nx/next:server",
+      "executor": "nx:run-commands",
+      "continuous": true,
       "options": {
-        "buildTarget": "next-tier-list:build",
-        "dev": true,
-        "port": 3002
+        "command": "pnpm dev",
+        "cwd": "apps/next-tier-list"
       }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "pnpm start",
+        "cwd": "apps/next-tier-list"
+      },
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "nx:run-commands",

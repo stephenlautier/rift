@@ -6,20 +6,30 @@
   "tags": ["type:app", "scope:champions"],
   "targets": {
     "build": {
-      "executor": "@nx/next:build",
+      "executor": "nx:run-commands",
       "options": {
-        "root": "apps/next-champions",
-        "outputPath": "dist/apps/next-champions"
+        "command": "pnpm build",
+        "cwd": "apps/next-champions"
       },
+      "outputs": ["{projectRoot}/.next"],
       "dependsOn": ["^build"]
     },
     "dev": {
-      "executor": "@nx/next:server",
+      "executor": "nx:run-commands",
+      "continuous": true,
       "options": {
-        "buildTarget": "next-champions:build",
-        "dev": true,
-        "port": 3001
+        "command": "pnpm dev",
+        "cwd": "apps/next-champions"
       }
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "pnpm start",
+        "cwd": "apps/next-champions"
+      },
+      "dependsOn": ["build"]
     },
     "lint": {
       "executor": "nx:run-commands",
