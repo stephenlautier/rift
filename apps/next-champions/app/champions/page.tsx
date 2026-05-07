@@ -1,6 +1,7 @@
 import { fetchChampions } from "@rift/data-access";
 import { LolChampionCard } from "@rift/ui/react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { JSX } from "react";
 
 import { API_URL } from "@/env";
@@ -21,7 +22,7 @@ export default async function ChampionsPage(): Promise<JSX.Element> {
 
 			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
 				{champions.map(champion => (
-					<a
+					<Link
 						key={champion.id}
 						href={`/champions/${champion.id}`}
 						className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
@@ -31,7 +32,7 @@ export default async function ChampionsPage(): Promise<JSX.Element> {
 							roles={champion.roles.join(",")}
 							difficulty={champion.difficulty}
 						/>
-					</a>
+					</Link>
 				))}
 			</div>
 		</div>
