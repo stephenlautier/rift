@@ -55,7 +55,13 @@ export function nextServerOutputTarget(opts: NextServerOutputTargetOptions = {})
 				opts.hydrateModule ??
 				(config.sys && config.packageJsonFilePath
 					? `${JSON.parse(config.sys.readFileSync(config.packageJsonFilePath, "utf8") ?? "{}").name}/hydrate`
-					: "@rift/ui/hydrate");
+					: (() => {
+							throw new Error(
+								"[next-server-components] Could not resolve hydrateModule automatically. " +
+									"Please pass the hydrateModule option explicitly, e.g. " +
+									'nextServerOutputTarget({ hydrateModule: "my-package/hydrate" })',
+							);
+						})());
 
 			const components = docs.components.filter(c => !c.internal);
 
