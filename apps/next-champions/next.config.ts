@@ -7,6 +7,15 @@ const config = {
 	// /{prefix}/_next/... so the shell's single catch-all rewrite handles both
 	// page routes and static assets (including WebSocket HMR upgrades).
 	assetPrefix: "/champions-static",
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https" as const,
+				hostname: "ddragon.leagueoflegends.com",
+				pathname: "/**",
+			},
+		],
+	},
 	// Allow the shell origin to access this dev server (HMR, hot-reload).
 	allowedDevOrigins: [new URL(SHELL_ORIGIN).host],
 	transpilePackages: ["@rift/next-shared", "@rift/ui"],

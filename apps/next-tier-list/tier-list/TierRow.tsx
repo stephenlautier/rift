@@ -1,4 +1,6 @@
 import type { Tier } from "@rift/champion";
+import Image from "next/image";
+import Link from "next/link";
 import type { ReactElement } from "react";
 
 import type { EnrichedTierEntry } from "./types";
@@ -15,9 +17,11 @@ const TIER_CLASSES: Record<Tier, string> = {
 type Props = {
 	tier: Tier;
 	entries: EnrichedTierEntry[];
+	/** True for the first non-empty tier row — enables LCP image preloading. */
+	isFirstRow?: boolean;
 };
 
-export function TierRow({ tier, entries }: Props): ReactElement | null {
+export function TierRow({ tier, entries, isFirstRow = false }: Props): ReactElement | null {
 	if (entries.length === 0) {
 		return null;
 	}
@@ -35,17 +39,20 @@ export function TierRow({ tier, entries }: Props): ReactElement | null {
 
 			{/* Champion cards */}
 			<div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-				{entries.map(entry => (
-					<a
+				{entries.map((entry, index) => (
+					<Link
 						key={entry.id}
 						href={`/champions/${entry.champion.id}`}
 						className="group rounded-lg border border-border bg-card hover:border-primary/50 transition-colors overflow-hidden">
-						<div className="aspect-video overflow-hidden">
-							{/* oxlint-disable-next-line nextjs/no-img-element -- splash art from known CDN, image optimization overkill here */}
-							<img
+						<div className="relative aspect-video overflow-hidden">
+							<Image
 								src={entry.champion.splashArtUrl}
 								alt={entry.champion.name}
-								className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+								fill
+								// Preload the first grid row of the first visible tier (LCP candidates)
+								priority={isFirstRow && index < 6}
+								className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
+								sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
 							/>
 						</div>
 						<div className="p-2">
@@ -56,7 +63,7 @@ export function TierRow({ tier, entries }: Props): ReactElement | null {
 								<span className="text-xs text-muted-foreground">{entry.pickRate.toFixed(1)}% PR</span>
 							</div>
 						</div>
-					</a>
+					</Link>
 				))}
 			</div>
 		</div>

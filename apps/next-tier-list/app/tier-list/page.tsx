@@ -8,6 +8,11 @@ import { TierListView } from "@/tier-list/TierListView";
 
 export const metadata: Metadata = { title: "Tier List" };
 
+// ISR — cache each unique ?tier=&role=&patch= URL for 5 minutes.
+// Crawlers and JS-disabled clients always receive fully-rendered HTML.
+// Background revalidation keeps data fresh without blocking requests.
+export const revalidate = 300;
+
 type SearchParams = Promise<{ tier?: string; role?: string; patch?: string }>;
 
 export default async function TierListPage({ searchParams }: { searchParams: SearchParams }): Promise<JSX.Element> {
@@ -45,6 +50,7 @@ export default async function TierListPage({ searchParams }: { searchParams: Sea
 	const patchFilter = patchParam ?? "latest";
 	const effectivePatch = patchFilter === "latest" ? latestPatch : patchFilter;
 
+	// oxlint-disable-next-line react-perf/jsx-no-new-array-as-prop -- Server Component; rendered once per request, memoization is irrelevant
 	const entries = allEntries.filter(e => {
 		if (tierFilter !== "all" && e.tier !== tierFilter) {
 			return false;

@@ -1,11 +1,13 @@
 import type { ChampionAbility, ChampionRole, ChampionSkin } from "@rift/champion";
-import { fetchChampionDetail } from "@rift/data-access";
+import { fetchChampionDetail, fetchChampions } from "@rift/data-access";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { cache } from "react";
 import type { JSX } from "react";
 
 import { API_URL } from "@/env";
-// import { delay } from "@/lib/delay";
 
 type ChampionPageProps = {
 	params: Promise<{ id: string }>;
@@ -20,10 +22,22 @@ const SLOT_LABEL: Record<string, string> = {
 	R: "Ultimate",
 };
 
+// Deduplicate the fetch across generateMetadata + page within the same request.
+const getChampionDetail = cache((id: string) => fetchChampionDetail(id, API_URL));
+
+export async function generateStaticParams(): Promise<{ id: string }[]> {
+	try {
+		const champions = await fetchChampions(API_URL);
+		return champions.map(c => ({ id: c.id }));
+	} catch {
+		return [];
+	}
+}
+
 export async function generateMetadata({ params }: ChampionPageProps): Promise<Metadata> {
 	const { id } = await params;
 	try {
-		const champion = await fetchChampionDetail(id, API_URL);
+		const champion = await getChampionDetail(id);
 		return { title: champion.name };
 	} catch {
 		return { title: "Champion" };
@@ -32,8 +46,9 @@ export async function generateMetadata({ params }: ChampionPageProps): Promise<M
 
 export default async function ChampionDetailPage({ params }: ChampionPageProps): Promise<JSX.Element> {
 	const { id } = await params;
-	const champion = await fetchChampionDetail(id, API_URL);
-	// await delay(1000);
+	const champion = await getChampionDetail(id).catch(() => {
+		notFound();
+	});
 
 	const abilities = [...champion.abilities].toSorted(
 		(a: ChampionAbility, b: ChampionAbility) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot),
@@ -52,9 +67,15 @@ export default async function ChampionDetailPage({ params }: ChampionPageProps):
 			</nav>
 
 			{/* Hero — full-width splash with gradient overlay */}
-			<section className="relative overflow-hidden rounded-xl mb-10">
-				{/* oxlint-disable-next-line nextjs/no-img-element -- splash art from external CDN */}
-				<img src={champion.splashArtUrl} alt={champion.name} className="w-full max-h-80 object-cover object-top" />
+			<section className="relative h-80 overflow-hidden rounded-xl mb-10">
+				<Image
+					src={champion.splashArtUrl}
+					alt={champion.name}
+					fill
+					priority
+					className="object-cover object-top"
+					sizes="100vw"
+				/>
 				<div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
 				<div className="absolute bottom-0 left-0 p-6">
 					<div className="flex flex-wrap gap-2 mb-2">
@@ -118,12 +139,13 @@ export default async function ChampionDetailPage({ params }: ChampionPageProps):
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 						{champion.skins.map((skin: ChampionSkin) => (
 							<div key={skin.id} className="rounded-lg overflow-hidden border border-border group">
-								<div className="aspect-video overflow-hidden">
-									{/* oxlint-disable-next-line nextjs/no-img-element -- skin splash from CDN */}
-									<img
+								<div className="relative aspect-video overflow-hidden">
+									<Image
 										src={skin.splashArtUrl}
 										alt={skin.name}
-										className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+										fill
+										className="object-cover object-top group-hover:scale-105 transition-transform duration-300"
+										sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
 									/>
 								</div>
 								<div className="p-2">
