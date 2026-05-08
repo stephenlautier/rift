@@ -19,7 +19,26 @@
 	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 }
 
-.splash {
+/* The slot element lives in shadow DOM and can be positioned relative to
+   .champion-card (position:relative). This makes slotted content fill the card
+   without depending on flat-tree containing-block resolution across the shadow
+   boundary (which browsers handle inconsistently). */
+slot[name="splash"] {
+	display: block;
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+/* ::slotted() styles from shadow DOM are lower-priority than main-document
+   author styles in the CSS cascade. Tailwind's base layer sets
+   `img { height: auto }` which defeats `::slotted(img) { height: 100% }`.
+   Using `position: absolute; inset: 0` instead avoids that: the element
+   stretches to fill its containing block (div.champion-card, position:relative
+   in the flat tree) without relying on percentage height resolution. */
+::slotted(img) {
+	position: absolute;
+	inset: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;

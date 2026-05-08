@@ -21,10 +21,11 @@ type Story = StoryObj<LolChampionCardArgs>;
 
 export const Default: Story = {
 	render: ({ name, splashArtUrl }) =>
-		html`<lol-champion-card name=${name} .splashArtUrl=${splashArtUrl}></lol-champion-card>`,
+		html`<lol-champion-card name=${name}>
+			<img slot="splash" src=${splashArtUrl} alt=${name} />
+		</lol-champion-card>`,
 	args: {
 		name: "Ahri",
-		splashArtUrl:
-			"https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg",
+		splashArtUrl: "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg",
 	},
 };

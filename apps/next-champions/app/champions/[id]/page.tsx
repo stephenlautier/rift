@@ -23,7 +23,7 @@ const SLOT_LABEL: Record<string, string> = {
 };
 
 // Deduplicate the fetch across generateMetadata + page within the same request.
-const getChampionDetail = cache((id: string) => fetchChampionDetail(id, API_URL));
+const getChampionDetail = cache(async (id: string) => fetchChampionDetail(id, API_URL));
 
 export async function generateStaticParams(): Promise<{ id: string }[]> {
 	try {

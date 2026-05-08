@@ -131,7 +131,8 @@ function generateComponentExport(component: JsonDocsComponent): string {
 	const props = component.props.filter(p => !p.internal);
 
 	// Props interface lines — all optional so callers can omit any prop.
-	const propLines = props.map(p => `\t${p.name}?: ${p.type};`).join("\n");
+	// children is always included so callers can pass slotted content.
+	const propLines = [...props.map(p => `\t${p.name}?: ${p.type};`), "\tchildren?: React.ReactNode;"].join("\n");
 
 	// Attr-map entries passed to both renderStencilElement (SSR) and the Host
 	// client component (for React prop reconciliation on re-renders).
@@ -154,8 +155,8 @@ ${propLines}
 \tconst attrs: Record<string, AttrValue> = {
 ${attrLines}
 \t};
-\tconst { innerHtml, styleElements, stencilHostAttrs } = await renderStencilElement("${component.tag}", attrs);
-\tconst host = React.createElement(${name}Host, { html: innerHtml, attrs: { ...attrs, ...stencilHostAttrs } });
+	const { shadowContent, styleElements, stencilHostAttrs } = await renderStencilElement("${component.tag}", attrs);
+	const host = React.createElement(${name}Host, { shadowContent, attrs: { ...attrs, ...stencilHostAttrs } }, props.children);
 \treturn styleElements.length > 0
 \t\t? React.createElement(React.Fragment, null, ...styleElements, host)
 \t\t: host;
@@ -194,7 +195,7 @@ type AttrValue = string | number | boolean | null | undefined;
 async function renderStencilElement(
 \ttagName: string,
 \tattrs: Record<string, AttrValue>,
-): Promise<{ innerHtml: string; styleElements: React.ReactElement[]; stencilHostAttrs: Record<string, string> }> {
+): Promise<{ shadowContent: string; styleElements: React.ReactElement[]; stencilHostAttrs: Record<string, string> }> {
 \tconst hydrate = await getHydrate();
 
 \tconst attrStr = Object.entries(attrs)
@@ -222,9 +223,20 @@ async function renderStencilElement(
 \tconst innerHtml = html
 \t\t.replace(new RegExp(\`^\\\\s*<\${tagName}[^>]*>\`, "i"), "")
 \t\t.replace(new RegExp(\`</\${tagName}>\\\\s*$\`, "i"), "")
-\t\t.trim();
-
-\tconst styleElements = (result.styles ?? [])
+		.trim();
+	// Extract the content inside <template shadowrootmode="open"> so it can be
+	// rendered as a React <template> element (for SSR) and used directly with
+	// attachShadow().innerHTML (for client navigation) — keeping light DOM
+	// children (slots) React-managed without interference.
+	//
+	// Stencil appends a hydration marker comment (e.g. <!--r.1-->) AFTER the
+	// closing </template> tag. Strip all trailing Stencil comments before
+	// matching, otherwise the $ anchor never matches and shadowContent keeps
+	// the full <template> tag — causing a double-nested DSD in the React output.
+	const innerHtmlClean = innerHtml.replace(/<!--[^>]*-->\\s*$/g, "").trim();
+	const templateMatch = innerHtmlClean.match(/^<template[^>]*>([\\s\\S]*)<\\/template>$/i);
+	const shadowContent = templateMatch?.[1] ?? innerHtmlClean;
+	const styleElements = (result.styles ?? [])
 \t\t.filter((s) => s.content)
 \t\t.map((s, i) =>
 \t\t\tReact.createElement("style", {
@@ -236,7 +248,7 @@ async function renderStencilElement(
 \t\t\t}),
 \t\t);
 
-\treturn { innerHtml, styleElements, stencilHostAttrs };
+	return { shadowContent, styleElements, stencilHostAttrs };
 }
 
 ${componentExports}
@@ -256,44 +268,44 @@ function generateClientFile(components: JsonDocsComponent[], packageName: string
 			const name = toPascalCase(c.tag);
 			return `let _defined${name} = false;
 
-export function ${name}Host({ html, attrs }: StencilHostProps) {
+export function ${name}Host({ shadowContent, attrs, children }: StencilHostProps) {
 \tconst ref = React.useRef<HTMLElement>(null);
 \tReact.useLayoutEffect(() => {
-\t\t// Register the custom element so Stencil's connectedCallback fires.
-\t\t// The react-server export condition bypasses components.ts, so
-\t\t// defineCustomElement is never called otherwise.
+\t\tconst el = ref.current;
+\t\tif (!el) return;
+\t\t// Pre-attach the shadow root BEFORE registering the custom element.
+\t\t// When defineCustomElement() triggers the upgrade, Stencil's connectedCallback
+\t\t// checks el.shadowRoot before calling attachShadow. By pre-attaching here we
+\t\t// ensure Stencil never attempts attachShadow on an element that already has a
+\t\t// shadow root (from DSD on initial SSR load or from our own call on navigation).
+\t\tif (!el.shadowRoot) {
+\t\t\t// Client-side navigation: no DSD shadow root exists yet.
+\t\t\tconst shadow = el.attachShadow({ mode: "open" });
+\t\t\tshadow.innerHTML = shadowContent;
+\t\t}
 \t\tif (!_defined${name}) {
 \t\t\tdefine${name}();
 \t\t\t_defined${name} = true;
 \t\t}
-\t\t// On client-side navigation, React creates a fresh element with no
-\t\t// shadow root (innerHTML doesn't parse <template shadowrootmode>).
-\t\t// setHTMLUnsafe does parse it correctly, so call it when needed.
-\t\tconst el = ref.current;
-\t\tif (el && !el.shadowRoot) {
-\t\t\tel.setHTMLUnsafe?.(html);
-\t\t}
-\t}, [html]);
-\t// During SSR, emit the DSD markup so the HTML parser creates shadow roots on
-\t// initial load. During client rendering (hydration + navigation), omit
-\t// dangerouslySetInnerHTML — React's innerHTML does not parse
-\t// <template shadowrootmode> as DSD, causing warnings and duplicated content.
-\t//
-\t// suppressHydrationWarning prevents React from warning about any mismatch:
-\t// the HTML parser already consumed the <template> before React hydrates,
-\t// leaving the DOM childless — which matches the client render (no children).
+\t}, [shadowContent]);
+\t// During SSR, render the DSD as a <template shadowrootmode> child alongside
+\t// light DOM children. The browser HTML parser consumes the <template> and
+\t// creates the shadow root; after parsing it is no longer in the DOM, leaving
+\t// only the slotted children — which matches the client render path below,
+\t// making hydration mismatch-free.
 \tif (typeof window === "undefined") {
-\t\treturn React.createElement("${c.tag}", {
-\t\t\t...(attrs as React.HTMLAttributes<HTMLElement>),
-\t\t\tsuppressHydrationWarning: true,
-\t\t\tdangerouslySetInnerHTML: { __html: html },
-\t\t} as React.HTMLAttributes<HTMLElement>);
+\t\treturn React.createElement(
+\t\t\t"${c.tag}",
+\t\t\t{ ...(attrs as React.HTMLAttributes<HTMLElement>), suppressHydrationWarning: true } as React.HTMLAttributes<HTMLElement>,
+\t\t\tReact.createElement("template", { shadowrootmode: "open", suppressHydrationWarning: true, dangerouslySetInnerHTML: { __html: shadowContent } } as unknown as React.HTMLAttributes<HTMLElement>),
+\t\t\tchildren,
+\t\t);
 \t}
 \treturn React.createElement("${c.tag}", {
 \t\tref,
 \t\t...(attrs as React.HTMLAttributes<HTMLElement>),
 \t\tsuppressHydrationWarning: true,
-\t} as React.HTMLAttributes<HTMLElement>);
+\t} as React.HTMLAttributes<HTMLElement>, children);
 }`;
 		})
 		.join("\n\n");
@@ -308,20 +320,20 @@ export function ${name}Host({ html, attrs }: StencilHostProps) {
  *      Stencil's connectedCallback fires on client-side navigation. Without
  *      this the element is unknown — the react-server export condition bypasses
  *      components.ts which is the only file that would call it.
- *   2. Calls setHTMLUnsafe() when no shadow root is present after mount, which
- *      correctly parses <template shadowrootmode> on client navigation.
- *   3. Uses dangerouslySetInnerHTML ONLY during SSR so the HTML parser receives
- *      the DSD template. Client renders omit it to prevent React from calling
- *      innerHTML — which would re-inject the template into light DOM without
- *      parsing it as DSD, causing warnings and duplicated content.
+ *   2. Restores the shadow root via attachShadow().innerHTML on client-side
+ *      navigation, without clobbering React-managed light DOM children (slots).
+ *   3. Renders the DSD as a <template shadowrootmode> React child during SSR.
+ *      The browser's HTML parser consumes the template and creates the shadow
+ *      root, leaving only light DOM children for React to hydrate against.
  */
 import React from "react";
 ${importLines}
 
 type AttrValue = string | number | boolean | null | undefined;
 type StencilHostProps = {
-\thtml: string;
+\tshadowContent: string;
 \tattrs: Record<string, AttrValue>;
+\tchildren?: React.ReactNode;
 };
 
 ${componentExports}

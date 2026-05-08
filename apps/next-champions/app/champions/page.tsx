@@ -1,6 +1,7 @@
 import { fetchChampions } from "@rift/data-access";
 import { LolChampionCard } from "@rift/ui/react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import type { JSX } from "react";
 
@@ -29,17 +30,17 @@ export default async function ChampionsPage(): Promise<JSX.Element> {
 						key={champion.id}
 						href={`/champions/${champion.id}`}
 						className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
-						<LolChampionCard
-							name={champion.name}
-							splashArtUrl={champion.splashArtUrl}
-							roles={champion.roles.join(",")}
-							difficulty={champion.difficulty}
-							// First row (5 cols on lg+): load eagerly — these are the LCP candidates.
-							// fetchpriority is forwarded as a host attribute; Stencil passes it to
-							// the browser which uses it as a resource priority hint.
-							loading={index < 5 ? "eager" : "lazy"}
-							fetchpriority={index === 0 ? "high" : "auto"}
-						/>
+						<LolChampionCard name={champion.name} roles={champion.roles.join(",")} difficulty={champion.difficulty}>
+							<Image
+								slot="splash"
+								className="h-full w-full object-cover object-top"
+								src={champion.splashArtUrl}
+								alt={champion.name}
+								width={308}
+								height={411}
+								priority={index < 5}
+							/>
+						</LolChampionCard>
 					</Link>
 				))}
 			</div>
