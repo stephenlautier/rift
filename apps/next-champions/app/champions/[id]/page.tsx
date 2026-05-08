@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { JSX } from "react";
 
 import { API_URL } from "@/env";
+// import { delay } from "@/lib/delay";
 
 type ChampionPageProps = {
 	params: Promise<{ id: string }>;
@@ -32,6 +33,7 @@ export async function generateMetadata({ params }: ChampionPageProps): Promise<M
 export default async function ChampionDetailPage({ params }: ChampionPageProps): Promise<JSX.Element> {
 	const { id } = await params;
 	const champion = await fetchChampionDetail(id, API_URL);
+	// await delay(1000);
 
 	const abilities = [...champion.abilities].toSorted(
 		(a: ChampionAbility, b: ChampionAbility) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot),
