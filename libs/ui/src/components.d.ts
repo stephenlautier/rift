@@ -16,6 +16,16 @@ export namespace Components {
          */
         "difficulty": number;
         /**
+          * Maps to the <img fetchpriority> attribute. Pass "high" for the first visible card to hint the browser to preload it. Note: set as an attribute on the host element; the prop is declared so React wrappers can accept it, but fetchpriority on the inner <img> is not set here because Stencil's JSX types do not yet include it.
+          * @default "auto"
+         */
+        "fetchpriority": "high" | "low" | "auto";
+        /**
+          * Maps to the <img loading> attribute. Pass "eager" for above-the-fold cards to avoid lazy-loading the LCP image.
+          * @default "lazy"
+         */
+        "loading": "lazy" | "eager";
+        /**
           * Champion name
           * @default ""
          */
@@ -77,6 +87,16 @@ declare namespace LocalJSX {
          */
         "difficulty"?: number;
         /**
+          * Maps to the <img fetchpriority> attribute. Pass "high" for the first visible card to hint the browser to preload it. Note: set as an attribute on the host element; the prop is declared so React wrappers can accept it, but fetchpriority on the inner <img> is not set here because Stencil's JSX types do not yet include it.
+          * @default "auto"
+         */
+        "fetchpriority"?: "high" | "low" | "auto";
+        /**
+          * Maps to the <img loading> attribute. Pass "eager" for above-the-fold cards to avoid lazy-loading the LCP image.
+          * @default "lazy"
+         */
+        "loading"?: "lazy" | "eager";
+        /**
           * Champion name
           * @default ""
          */
@@ -108,6 +128,8 @@ declare namespace LocalJSX {
         "splashArtUrl": string;
         "roles": string;
         "difficulty": number;
+        "loading": "lazy" | "eager";
+        "fetchpriority": "high" | "low" | "auto";
     }
     interface LolTierBadgeAttributes {
         "tier": "S" | "A" | "B" | "C" | "D";
