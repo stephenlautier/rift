@@ -40,12 +40,14 @@ function ChampionsListPage(): JSX.Element {
 						to="/champions/$id"
 						params={{ id: champion.id }}
 						className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
-						<LolChampionCard
-							name={champion.name}
-							splashArtUrl={champion.splashArtUrl}
-							roles={champion.roles.join(",")}
-							difficulty={champion.difficulty}
-						/>
+						<LolChampionCard name={champion.name} roles={champion.roles.join(",")} difficulty={champion.difficulty}>
+							<img
+								slot="splash"
+								className="h-full w-full object-cover object-top"
+								src={champion.splashArtUrl}
+								alt={champion.name}
+							/>
+						</LolChampionCard>
 					</Link>
 				))}
 			</div>

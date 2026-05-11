@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 	const TS_TIER_LIST_URL = env.TS_TIER_LIST_URL ?? "http://localhost:3002";
 	const TS_PLAYER_URL = env.TS_PLAYER_URL ?? "http://localhost:3003";
 	const API_URL = env.API_URL ?? "http://localhost:3100";
-	const port = Number.parseInt(env.PORT ?? "3000");
+	const port = Number.parseInt(env.PORT ?? "3000", 10);
 
 	return {
 		plugins: [

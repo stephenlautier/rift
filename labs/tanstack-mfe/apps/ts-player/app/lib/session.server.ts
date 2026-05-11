@@ -1,14 +1,16 @@
-import { getSession } from "@auth/core";
 import type { Session } from "@auth/core/types";
-import { authjsConfig } from "@rift/auth";
-import { createServerFn } from "@tanstack/react-start";
+import { getSession } from "@rift/auth";
 import { getRequest } from "@tanstack/react-start/server";
 
 /**
- * Reads the Auth.js session for the current request.
- * Used in the player zone's root `beforeLoad` to guard all /player/** routes.
+ * Plain server-side helper that reads the Auth.js session for the current
+ * request. Called inside a `createServerFn` handler in `__root.tsx` so it
+ * always runs on the server — the `getRequest()` context is live.
+ *
+ * Do NOT wrap this in a second `createServerFn` — nesting server fns causes
+ * the inner `getRequest()` to lose the original HTTP context.
  */
-export const getServerSession = createServerFn().handler(async (): Promise<Session | null> => {
+export async function getServerSession(): Promise<Session | null> {
 	const request = getRequest();
-	return getSession(request, authjsConfig);
-});
+	return getSession(request);
+}

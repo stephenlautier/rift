@@ -6,7 +6,7 @@ import type { JSX } from "react";
 const API_URL = process.env.API_URL ?? "http://localhost:3100";
 
 const fetchDetail = createServerFn()
-	.validator((id: string) => id)
+	.inputValidator((id: string) => id)
 	.handler(({ data: id }) => fetchChampionDetail(id, API_URL));
 
 export const Route = createFileRoute("/champions/$id")({
@@ -26,7 +26,7 @@ function ChampionDetailPage(): JSX.Element {
 			{/* Splash art hero */}
 			<div className="relative h-64 sm:h-80 rounded-xl overflow-hidden">
 				<img src={champion.splashArtUrl} alt={champion.name} className="w-full h-full object-cover object-top" />
-				<div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+				<div className="absolute inset-0 bg-linear-to-t from-background/80 to-transparent" />
 				<div className="absolute bottom-4 left-4">
 					<h1 className="text-4xl font-bold text-white drop-shadow">{champion.name}</h1>
 					<p className="text-sm text-white/80 mt-1">{champion.roles.join(" · ")}</p>

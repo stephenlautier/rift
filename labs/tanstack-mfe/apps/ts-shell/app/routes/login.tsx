@@ -3,12 +3,15 @@ import type { ChangeEvent, JSX } from "react";
 import { useCallback, useState } from "react";
 
 export const Route = createFileRoute("/login")({
+	validateSearch: (search: Record<string, unknown>): { callbackUrl?: string } => ({
+		callbackUrl: typeof search.callbackUrl === "string" ? search.callbackUrl : undefined,
+	}),
 	component: LoginPage,
 });
 
 function LoginPage(): JSX.Element {
 	const router = useRouter();
-	const { callbackUrl } = Route.useSearch<{ callbackUrl?: string }>();
+	const { callbackUrl } = Route.useSearch();
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);

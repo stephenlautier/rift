@@ -42,7 +42,7 @@ type TierListLoaderData = {
  * streamed to the client as part of SSR.
  */
 const fetchTierListData = createServerFn()
-	.validator((search: SearchParams) => search)
+	.inputValidator((search: SearchParams) => search)
 	.handler(async ({ data: search }): Promise<TierListLoaderData> => {
 		const [tierList, champions] = await Promise.all([fetchTierList({}, API_URL), fetchChampions(API_URL)]);
 

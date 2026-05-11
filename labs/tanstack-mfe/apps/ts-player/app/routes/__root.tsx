@@ -58,8 +58,15 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 	shellComponent: RootDocument,
 });
 
-function handleSignOut(): void {
-	globalThis.location.href = "/api/auth/signout";
+async function handleSignOut(): Promise<void> {
+	const csrfRes = await fetch("/api/auth/csrf");
+	const { csrfToken } = (await csrfRes.json()) as Record<string, string>;
+	await fetch("/api/auth/signout", {
+		method: "POST",
+		headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		body: new URLSearchParams({ csrfToken }).toString(),
+	});
+	globalThis.location.href = "/";
 }
 
 function RootDocument({ children }: { children: ReactNode }) {

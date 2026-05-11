@@ -70,13 +70,14 @@ function PlayerPage(): JSX.Element {
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					{topMastery.map(pc =>
 						pc.champion ? (
-							<LolChampionCard
-								key={pc.championId}
-								championId={pc.champion.id}
-								name={pc.champion.name}
-								splashArtUrl={pc.champion.splashArtUrl}
-								roles={pc.champion.roles.join(", ")}
-							/>
+							<LolChampionCard key={pc.championId} name={pc.champion.name} roles={pc.champion.roles.join(", ")}>
+								<img
+									slot="splash"
+									className="h-full w-full object-cover object-top"
+									src={pc.champion.splashArtUrl}
+									alt={pc.champion.name}
+								/>
+							</LolChampionCard>
 						) : null,
 					)}
 				</div>

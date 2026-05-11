@@ -8,6 +8,8 @@ export function getRouter() {
 		defaultPreload: "intent",
 		defaultPreloadStaleTime: 0,
 		scrollRestoration: true,
+		// Initial context shape required by createRootRouteWithContext<RouterContext>()
+		context: { session: null },
 	});
 }
 
