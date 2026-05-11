@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { JSX, ReactNode } from "react";
 
 import type { NavZone } from "../nav-links";
@@ -38,7 +39,11 @@ export function Nav({ currentZone, renderLink }: NavProps): JSX.Element {
 				const className = isActive
 					? "text-foreground font-semibold relative after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:bg-primary after:rounded-full"
 					: "text-muted-foreground transition-colors hover:text-foreground";
-				return renderLink({ href, zone, children: label, className, ariaCurrent: isActive ? "page" : undefined });
+				return (
+					<Fragment key={href}>
+						{renderLink({ href, zone, children: label, className, ariaCurrent: isActive ? "page" : undefined })}
+					</Fragment>
+				);
 			})}
 		</nav>
 	);

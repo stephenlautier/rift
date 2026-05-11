@@ -25,18 +25,33 @@ type TierListViewProps = {
 	initialTier: TierFilter;
 	initialRole: RoleFilter;
 	initialPatch: string;
+	latestPatch: string;
 };
 
-const TIERS: Tier[] = ["S", "A", "B", "C", "D"];
+const TIER_ORDER: Tier[] = ["S", "A", "B", "C", "D"];
 const ROLES: ChampionRole[] = ["Top", "Jungle", "Mid", "ADC", "Support"];
 
-const TIER_COLORS: Record<Tier, string> = {
-	S: "bg-yellow-500 text-yellow-950",
-	A: "bg-green-500 text-green-950",
-	B: "bg-blue-500 text-blue-950",
-	C: "bg-orange-500 text-orange-950",
-	D: "bg-red-500 text-red-950",
+// Badge colours per tier — matches Next.js TierRow
+const TIER_BADGE: Record<Tier, string> = {
+	S: "text-[#f0b232] bg-[rgba(240,178,50,0.15)] border-[#f0b232]",
+	A: "text-[#c45dff] bg-[rgba(196,93,255,0.15)] border-[#c45dff]",
+	B: "text-[#4f9eff] bg-[rgba(79,158,255,0.15)] border-[#4f9eff]",
+	C: "text-[#5bcf6e] bg-[rgba(91,207,110,0.15)] border-[#5bcf6e]",
+	D: "text-[#9ca3af] bg-[rgba(156,163,175,0.15)] border-[#9ca3af]",
 };
+
+// Filter button active colours per tier — matches Next.js TierListFilters
+const TIER_FILTER_ACTIVE: Record<Tier | "all", string> = {
+	all: "border-border bg-muted/50 text-foreground ring-1 ring-current",
+	S: "border-amber-400 bg-amber-400/10 text-amber-400 ring-1 ring-current",
+	A: "border-purple-400 bg-purple-400/10 text-purple-400 ring-1 ring-current",
+	B: "border-blue-400 bg-blue-400/10 text-blue-400 ring-1 ring-current",
+	C: "border-green-400 bg-green-400/10 text-green-400 ring-1 ring-current",
+	D: "border-gray-400 bg-gray-400/10 text-gray-400 ring-1 ring-current",
+};
+const TIER_FILTER_INACTIVE = "border-border text-muted-foreground hover:border-current hover:text-foreground";
+const ROLE_ACTIVE = "border-primary bg-primary/10 text-primary ring-1 ring-primary";
+const ROLE_INACTIVE = "border-border text-muted-foreground hover:border-foreground hover:text-foreground";
 
 export function TierListView({
 	entries,
@@ -44,6 +59,7 @@ export function TierListView({
 	initialTier,
 	initialRole,
 	initialPatch,
+	latestPatch,
 }: TierListViewProps): JSX.Element {
 	const navigate = useNavigate({ from: "/tier-list/" });
 	const [tier, setTier] = useState<TierFilter>(initialTier);
@@ -78,93 +94,147 @@ export function TierListView({
 		applyFilters(tier, role, value);
 	};
 
+	// Group entries by tier
+	const byTier = new Map<Tier, TierListEntry[]>();
+	for (const t of TIER_ORDER) {
+		byTier.set(t, []);
+	}
+	for (const entry of entries) {
+		byTier.get(entry.tier)?.push(entry);
+	}
+
+	const displayPatch = patch === "latest" ? latestPatch : patch;
+	const firstNonEmptyTier = TIER_ORDER.find(t => (byTier.get(t)?.length ?? 0) > 0);
+
 	return (
-		<div className="space-y-6">
-			{/* Filters */}
-			<div className="flex flex-wrap gap-4">
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Tier:</span>
-					{(["all", ...TIERS] as const).map(t => (
-						<button
-							key={t}
-							type="button"
-							onClick={() => handleTier(t)}
-							className={`rounded px-2.5 py-1 text-sm font-semibold transition-colors ${tier === t ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>
-							{t === "all" ? "All" : t}
-						</button>
-					))}
-				</div>
+		<div>
+			{/* Page heading */}
+			<div className="mb-6">
+				<h1 className="text-3xl font-bold tracking-tight">Tier List</h1>
+				<p className="mt-1 text-muted-foreground">
+					Patch {displayPatch} — {entries.length} champion/role combinations
+				</p>
+			</div>
 
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Role:</span>
-					{(["all", ...ROLES] as const).map(r => (
-						<button
-							key={r}
-							type="button"
-							onClick={() => handleRole(r)}
-							className={`rounded px-2.5 py-1 text-sm font-semibold transition-colors ${role === r ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>
-							{r === "all" ? "All" : r}
-						</button>
-					))}
-				</div>
-
-				{patches.length > 0 && (
-					<div className="flex items-center gap-2">
-						<span className="text-sm font-medium text-muted-foreground">Patch:</span>
-						{["latest", ...patches].map(p => (
+			{/* Filter panel */}
+			<div className="space-y-3 mb-8 p-4 rounded-xl border border-border bg-card">
+				<div>
+					<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Tier</p>
+					<div className="flex flex-wrap gap-2">
+						{(["all", ...TIER_ORDER] as const).map(t => (
 							<button
-								key={p}
+								key={t}
 								type="button"
-								onClick={() => handlePatch(p)}
-								className={`rounded px-2.5 py-1 text-sm transition-colors ${patch === p ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>
-								{p}
+								aria-pressed={tier === t}
+								onClick={() => handleTier(t)}
+								className={`px-3 py-1 rounded-md text-sm font-semibold border transition-colors ${
+									tier === t ? TIER_FILTER_ACTIVE[t] : TIER_FILTER_INACTIVE
+								}`}>
+								{t === "all" ? "All Tiers" : t}
 							</button>
 						))}
+					</div>
+				</div>
+
+				<div>
+					<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Role</p>
+					<div className="flex flex-wrap gap-2">
+						{(["all", ...ROLES] as const).map(r => (
+							<button
+								key={r}
+								type="button"
+								aria-pressed={role === r}
+								onClick={() => handleRole(r)}
+								className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
+									role === r ? ROLE_ACTIVE : ROLE_INACTIVE
+								}`}>
+								{r === "all" ? "All Roles" : r}
+							</button>
+						))}
+					</div>
+				</div>
+
+				{patches.length > 1 && (
+					<div>
+						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Patch</p>
+						<div className="flex flex-wrap gap-2">
+							<button
+								type="button"
+								aria-pressed={patch === "latest"}
+								onClick={() => handlePatch("latest")}
+								className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
+									patch === "latest" ? ROLE_ACTIVE : ROLE_INACTIVE
+								}`}>
+								Latest
+							</button>
+							{patches.map(p => (
+								<button
+									key={p}
+									type="button"
+									aria-pressed={patch === p}
+									onClick={() => handlePatch(p)}
+									className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors ${
+										patch === p ? ROLE_ACTIVE : ROLE_INACTIVE
+									}`}>
+									{p}
+								</button>
+							))}
+						</div>
 					</div>
 				)}
 			</div>
 
-			{/* Table */}
+			{/* Tier rows */}
 			{entries.length === 0 ? (
-				<p className="text-muted-foreground">No champions match the selected filters.</p>
+				<p className="text-center text-muted-foreground py-16">No champions match these filters.</p>
 			) : (
-				<div className="rounded-md border">
-					<table className="w-full text-sm">
-						<thead>
-							<tr className="border-b bg-muted/50">
-								<th className="px-4 py-3 text-left font-medium">Champion</th>
-								<th className="px-4 py-3 text-left font-medium">Tier</th>
-								<th className="px-4 py-3 text-left font-medium">Role</th>
-								<th className="px-4 py-3 text-right font-medium">Win Rate</th>
-								<th className="px-4 py-3 text-right font-medium">Pick Rate</th>
-							</tr>
-						</thead>
-						<tbody>
-							{entries.map(entry => (
-								<tr key={entry.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-									<td className="px-4 py-3">
-										<div className="flex items-center gap-3">
-											<img
-												src={entry.champion.splashArtUrl}
-												alt={entry.champion.name}
-												className="h-8 w-8 rounded-full object-cover"
-											/>
-											<span className="font-medium">{entry.champion.name}</span>
-										</div>
-									</td>
-									<td className="px-4 py-3">
-										<span
-											className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${TIER_COLORS[entry.tier]}`}>
-											{entry.tier}
-										</span>
-									</td>
-									<td className="px-4 py-3 text-muted-foreground">{entry.role}</td>
-									<td className="px-4 py-3 text-right tabular-nums">{(entry.winRate * 100).toFixed(1)}%</td>
-									<td className="px-4 py-3 text-right tabular-nums">{(entry.pickRate * 100).toFixed(1)}%</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
+				<div className="space-y-6">
+					{TIER_ORDER.map(t => {
+						const tierEntries = byTier.get(t) ?? [];
+						if (tierEntries.length === 0) {
+							return null;
+						}
+						return (
+							<div key={t} className="flex gap-4 items-start">
+								{/* Tier badge */}
+								<div className="shrink-0 w-12 flex flex-col items-center pt-3">
+									<span
+										aria-label={`Tier ${t}`}
+										className={`w-9 h-9 flex items-center justify-center rounded-md border-2 text-[1.1rem] font-extrabold tracking-tight ${TIER_BADGE[t]}`}>
+										{t}
+									</span>
+								</div>
+
+								{/* Champion cards */}
+								<div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+									{tierEntries.map((entry, index) => (
+										<a
+											key={entry.id}
+											href={`/champions/${entry.champion.id}`}
+											className="group rounded-lg border border-border bg-card hover:border-primary/50 transition-colors overflow-hidden">
+											<div className="relative aspect-video overflow-hidden">
+												<img
+													src={entry.champion.splashArtUrl}
+													alt={entry.champion.name}
+													// oxlint-disable-next-line react/no-unknown-property -- fetchpriority is valid HTML
+													fetchPriority={t === firstNonEmptyTier && index < 6 ? "high" : "auto"}
+													className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+												/>
+											</div>
+											<div className="p-2">
+												<p className="text-xs font-semibold truncate">{entry.champion.name}</p>
+												<p className="text-xs text-muted-foreground">{entry.role}</p>
+												<div className="flex justify-between mt-1">
+													<span className="text-xs text-green-400">{entry.winRate.toFixed(1)}% WR</span>
+													<span className="text-xs text-muted-foreground">{entry.pickRate.toFixed(1)}% PR</span>
+												</div>
+											</div>
+										</a>
+									))}
+								</div>
+							</div>
+						);
+					})}
 				</div>
 			)}
 		</div>

@@ -31,6 +31,7 @@ type TierListLoaderData = {
 		};
 	}[];
 	patches: string[];
+	latestPatch: string;
 	tierFilter: TierFilter;
 	roleFilter: RoleFilter;
 	patchFilter: string;
@@ -94,7 +95,7 @@ const fetchTierListData = createServerFn()
 			return true;
 		});
 
-		return { entries, patches, tierFilter, roleFilter, patchFilter };
+		return { entries, patches, tierFilter, roleFilter, patchFilter, latestPatch };
 	});
 
 export const Route = createFileRoute("/tier-list/")({
@@ -121,20 +122,15 @@ export const Route = createFileRoute("/tier-list/")({
 });
 
 function TierListPage(): JSX.Element {
-	const { entries, patches, tierFilter, roleFilter, patchFilter } = Route.useLoaderData();
+	const { entries, patches, tierFilter, roleFilter, patchFilter, latestPatch } = Route.useLoaderData();
 	return (
-		<div>
-			<div className="mb-8">
-				<h1 className="text-3xl font-bold tracking-tight">Tier List</h1>
-				<p className="mt-1 text-muted-foreground">Current patch champion rankings by role and tier.</p>
-			</div>
-			<TierListView
-				entries={entries}
-				patches={patches}
-				initialTier={tierFilter}
-				initialRole={roleFilter}
-				initialPatch={patchFilter}
-			/>
-		</div>
+		<TierListView
+			entries={entries}
+			patches={patches}
+			initialTier={tierFilter}
+			initialRole={roleFilter}
+			initialPatch={patchFilter}
+			latestPatch={latestPatch}
+		/>
 	);
 }

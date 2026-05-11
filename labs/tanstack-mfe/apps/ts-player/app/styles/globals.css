@@ -2,3 +2,4 @@
 @import "tw-animate-css";
 @import "@rift/styles/tokens.css";
 @import "@rift/styles/components.css";
+@source "../../../../libs/ts-shared/src";

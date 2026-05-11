@@ -6,6 +6,12 @@ import type { ReactNode } from "react";
 
 import appCss from "../styles/globals.css?url";
 
+// Injected by vite.config.ts `define` — resolves to the zone's own origin URL
+// (e.g. "http://localhost:3001"). The import map uses this to fix Vite-internal
+// path resolution when the zone is served through the shell proxy.
+// oxlint-disable-next-line no-underscore-dangle -- vite define global
+declare const __ZONE_ORIGIN__: string;
+
 const CURRENT_ZONE: NavZone = "champions";
 
 const renderLink: RenderLinkFn = ({ href, zone, children, className, ariaCurrent }: RenderLinkProps) => {
@@ -35,6 +41,25 @@ function RootDocument({ children }: { children: ReactNode }) {
 	return (
 		<html lang="en">
 			<head>
+				{/* Dev-only import map: redirects Vite-internal bare specifiers
+				    (/@react-refresh, /@id/virtual:tanstack-start-client-entry) to
+				    absolute URLs on this zone's port so they resolve correctly
+				    when the page is served via the shell proxy on a different port. */}
+				{import.meta.env.DEV && (
+					<script
+						type="importmap"
+						// oxlint-disable-next-line react/no-danger -- dev-only, safe static string
+						dangerouslySetInnerHTML={{
+							__html: JSON.stringify({
+								imports: {
+									"/@react-refresh": `${__ZONE_ORIGIN__}/@react-refresh`,
+									"/@id/virtual:tanstack-start-client-entry": `${__ZONE_ORIGIN__}/@id/virtual:tanstack-start-client-entry`,
+									"/@vite/client": `${__ZONE_ORIGIN__}/@vite/client`,
+								},
+							}),
+						}}
+					/>
+				)}
 				<HeadContent />
 			</head>
 			<body>
