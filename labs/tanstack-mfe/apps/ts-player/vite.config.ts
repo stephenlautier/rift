@@ -93,9 +93,11 @@ export default defineConfig(({ mode }) => {
 				name: "rift:patch-server-fn-base",
 				apply: "serve",
 				transform(code: string, id: string) {
-					if (!id.includes("createClientRpc")) return;
+					if (!id.includes("createClientRpc")) {
+						return;
+					}
 					return {
-						code: code.replace(/process\.env\.TSS_SERVER_FN_BASE/g, JSON.stringify("/player/_serverFn/")),
+						code: code.replaceAll(/process\.env\.TSS_SERVER_FN_BASE/g, JSON.stringify("/player/_serverFn/")),
 					};
 				},
 			},
