@@ -21,12 +21,9 @@ export default function Page() {
 						key={champion.id}
 						href={`/champions/${champion.id}`}
 						className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
-						<LolChampionCard
-							name={champion.name}
-							splashArtUrl={champion.splashArtUrl}
-							roles={champion.roles.join(",")}
-							difficulty={champion.difficulty}
-						/>
+						<LolChampionCard name={champion.name} roles={champion.roles.join(",")} difficulty={champion.difficulty}>
+							<img slot="splash" src={champion.splashArtUrl} alt={champion.name} loading="lazy" />
+						</LolChampionCard>
 					</a>
 				))}
 			</div>

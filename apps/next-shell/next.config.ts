@@ -8,6 +8,15 @@ const API_URL = process.env.API_URL ?? "http://localhost:3100";
 const config: NextConfig = {
 	transpilePackages: ["@rift/next-shared", "@rift/ui"],
 	serverExternalPackages: ["@rift/ui/hydrate"],
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "ddragon.leagueoflegends.com",
+				pathname: "/**",
+			},
+		],
+	},
 	async rewrites() {
 		return [
 			// ── Zone rewrites ───────────────────────────────────────────────────────

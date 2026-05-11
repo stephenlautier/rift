@@ -27,10 +27,20 @@ export function TierListView({
 	latestPatch,
 }: Props): ReactElement {
 	const byTier = new Map<Tier, EnrichedTierEntry[]>();
-	for (const tier of TIER_ORDER) byTier.set(tier, []);
-	for (const entry of entries) byTier.get(entry.tier)?.push(entry);
+	for (const tier of TIER_ORDER) {
+		byTier.set(tier, []);
+	}
+	for (const entry of entries) {
+		byTier.get(entry.tier)?.push(entry);
+	}
 
 	const displayPatch = patchFilter === "latest" ? latestPatch : patchFilter;
+	const firstNonEmptyTier = TIER_ORDER.find(t => (byTier.get(t)?.length ?? 0) > 0);
+
+	// oxlint-disable-next-line react-perf/jsx-no-jsx-as-prop -- Server Component; renders once per request, no reconciliation cost
+	const filtersFallback = (
+		<div className="h-[104px] rounded-xl border border-border bg-card mb-8 animate-pulse" aria-hidden="true" />
+	);
 
 	return (
 		<div>
@@ -41,7 +51,7 @@ export function TierListView({
 				</p>
 			</div>
 
-			<Suspense>
+			<Suspense fallback={filtersFallback}>
 				<TierListFilters patches={patches} tierFilter={tierFilter} roleFilter={roleFilter} patchFilter={patchFilter} />
 			</Suspense>
 
@@ -50,7 +60,12 @@ export function TierListView({
 			) : (
 				<div className="space-y-6">
 					{TIER_ORDER.map(tier => (
-						<TierRow key={tier} tier={tier} entries={byTier.get(tier) ?? EMPTY_ENTRIES} />
+						<TierRow
+							key={tier}
+							tier={tier}
+							entries={byTier.get(tier) ?? EMPTY_ENTRIES}
+							isFirstRow={tier === firstNonEmptyTier}
+						/>
 					))}
 				</div>
 			)}

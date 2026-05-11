@@ -12,9 +12,6 @@ export class LolChampionCard {
 	/** Champion name */
 	@Prop() name: string = "";
 
-	/** URL to the champion splash art */
-	@Prop() splashArtUrl: string = "";
-
 	/** Comma-separated list of roles (e.g. "Mid,Support") */
 	@Prop() roles: string = "";
 
@@ -32,7 +29,7 @@ export class LolChampionCard {
 
 		return (
 			<div class="champion-card">
-				{this.splashArtUrl && <img class="splash" src={this.splashArtUrl} alt={this.name} loading="lazy" />}
+				<slot name="splash" />
 				<div class="overlay">
 					<span class="name">{this.name}</span>
 					{roleList.length > 0 && (
@@ -51,7 +48,6 @@ export class LolChampionCard {
 						))}
 					</div>
 				</div>
-				<slot />
 			</div>
 		);
 	}

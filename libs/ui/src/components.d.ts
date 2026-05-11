@@ -25,11 +25,6 @@ export namespace Components {
           * @default ""
          */
         "roles": string;
-        /**
-          * URL to the champion splash art
-          * @default ""
-         */
-        "splashArtUrl": string;
     }
     /**
      * Displays a color-coded tier badge (S / A / B / C / D) for LoL champion rankings.
@@ -86,11 +81,6 @@ declare namespace LocalJSX {
           * @default ""
          */
         "roles"?: string;
-        /**
-          * URL to the champion splash art
-          * @default ""
-         */
-        "splashArtUrl"?: string;
     }
     /**
      * Displays a color-coded tier badge (S / A / B / C / D) for LoL champion rankings.
@@ -105,7 +95,6 @@ declare namespace LocalJSX {
 
     interface LolChampionCardAttributes {
         "name": string;
-        "splashArtUrl": string;
         "roles": string;
         "difficulty": number;
     }
