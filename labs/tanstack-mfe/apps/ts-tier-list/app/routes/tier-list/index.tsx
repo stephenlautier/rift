@@ -106,16 +106,26 @@ export const Route = createFileRoute("/tier-list/")({
 		patch: typeof search.patch === "string" ? search.patch : undefined,
 	}),
 	/**
+	 * loaderDeps tells TanStack Router which search params the loader depends on.
+	 * Without this the loader only runs on the initial route mount — changing search
+	 * params (filter clicks) would update the URL but never re-fetch data.
+	 */
+	loaderDeps: ({ search }) => ({
+		tier: search.tier,
+		role: search.role,
+		patch: search.patch,
+	}),
+	/**
 	 * Loader calls the server function with current search params.
-	 * TanStack Router re-runs the loader when search params change,
+	 * TanStack Router re-runs the loader whenever loaderDeps change,
 	 * giving URL-driven SSR filtering (filters are bookmarkable).
 	 */
-	loader: ({ location }) =>
+	loader: ({ deps }) =>
 		fetchTierListData({
 			data: {
-				tier: location.search.tier,
-				role: location.search.role,
-				patch: location.search.patch,
+				tier: deps.tier,
+				role: deps.role,
+				patch: deps.patch,
 			},
 		}),
 	component: TierListPage,

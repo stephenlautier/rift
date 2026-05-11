@@ -90,6 +90,16 @@ export default defineConfig(({ mode }) => {
 		// Expose zone origin as a compile-time constant so __root.tsx can inject
 		// a dev-mode import map that redirects Vite-internal paths to this zone's
 		// port, preventing cross-zone hydration errors when served via shell proxy.
-		define: { __ZONE_ORIGIN__: JSON.stringify(`http://localhost:${port}`) },
+		//
+		// TSS_SERVER_FN_BASE: TanStack Start server function RPC calls use
+		// `process.env.TSS_SERVER_FN_BASE + functionId` as the fetch URL.
+		// Without an absolute base the URL resolves to the shell proxy origin
+		// (port 3000) which has no proxy rule for /_server/** paths, so the RPC
+		// fails silently and useLoaderData() returns undefined. Pointing it at
+		// the zone's own origin makes client-side navigations work correctly.
+		define: {
+			__ZONE_ORIGIN__: JSON.stringify(`http://localhost:${port}`),
+			"process.env.TSS_SERVER_FN_BASE": JSON.stringify(`http://localhost:${port}`),
+		},
 	};
 });

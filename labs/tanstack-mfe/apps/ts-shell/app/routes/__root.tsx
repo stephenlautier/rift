@@ -1,4 +1,4 @@
-import { Header, Providers } from "@rift/ts-shared";
+import { Header, Providers, ThemeScript } from "@rift/ts-shared";
 import type { NavZone, RenderLinkFn, RenderLinkProps } from "@rift/ts-shared";
 import { createRootRoute, HeadContent, Link, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -61,8 +61,11 @@ function RootDocument({ children }: { children: ReactNode }) {
 	const { session } = Route.useRouteContext();
 
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
+				{/* Blocking inline script: applies dark class/colorScheme before first paint
+				    to prevent flash-of-incorrect-theme. Must be first in <head>. */}
+				<ThemeScript />
 				<HeadContent />
 			</head>
 			<body>

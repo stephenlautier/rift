@@ -9,6 +9,7 @@ export type { RenderLinkFn, RenderLinkProps } from "./components/Header";
 // Theme
 export { ThemeProvider, useTheme, isThemeMode, THEME_COOKIE_NAME } from "./theme/ThemeProvider";
 export type { ThemeMode, ThemeContextValue } from "./theme/ThemeProvider";
+export { ThemeScript } from "./theme/ThemeScript";
 export { ThemeSwitcher } from "./theme/ThemeSwitcher";
 
 // Providers (client wrapper)
