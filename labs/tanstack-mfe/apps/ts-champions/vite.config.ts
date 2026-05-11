@@ -87,24 +87,33 @@ export default defineConfig(({ mode }) => {
 					generatedRouteTree: "app/routeTree.gen.ts",
 					quoteStyle: "double",
 				},
+				// Zone-specific server function base path.
+				// The shell proxy rule `/champions/**` → 3001 covers this path,
+				// routing RPC calls to the right zone server.
+				serverFns: { base: "/champions/_serverFn" },
 			}),
 			viteReact(),
+			// In dev, `createClientRpc.js` is served via `@fs/` (not pre-bundled) so
+			// Vite's `define` substitution never runs on it. Patch it directly so the
+			// RPC fetches land on the correct zone server instead of the shell.
+			{
+				name: "rift:patch-server-fn-base",
+				apply: "serve",
+				transform(code: string, id: string) {
+					if (!id.includes("createClientRpc")) return;
+					return {
+						code: code.replace(/process\.env\.TSS_SERVER_FN_BASE/g, JSON.stringify("/champions/_serverFn/")),
+					};
+				},
+			},
 		],
 		server: { port, origin: `http://localhost:${port}` },
 		preview: { port },
 		// Expose zone origin as a compile-time constant so __root.tsx can inject
 		// a dev-mode import map that redirects Vite-internal paths to this zone's
 		// port, preventing cross-zone hydration errors when served via shell proxy.
-		//
-		// TSS_SERVER_FN_BASE: TanStack Start server function RPC calls use
-		// `process.env.TSS_SERVER_FN_BASE + functionId` as the fetch URL.
-		// Without an absolute base the URL resolves to the shell proxy origin
-		// (port 3000) which has no proxy rule for /_server/** paths, so the RPC
-		// fails silently and useLoaderData() returns undefined. Pointing it at
-		// the zone's own origin makes client-side navigations work correctly.
 		define: {
 			__ZONE_ORIGIN__: JSON.stringify(`http://localhost:${port}`),
-			"process.env.TSS_SERVER_FN_BASE": JSON.stringify(`http://localhost:${port}`),
 		},
 	};
 });
